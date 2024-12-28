@@ -2,6 +2,7 @@
 /*******************************************************************************/
 /* Copyright (C) 2012 Jonathan Moore Liles                                     */
 /* Copyright (C) 2001-2005 by Colin Jones                                      */
+/* Copyright (C) 2025-Stazed                                                   */
 /*                                                                             */
 /* This program is free software; you can redistribute it and/or modify it     */
 /* under the terms of the GNU General Public License as published by the       */
@@ -60,7 +61,7 @@ static void shade_rect_up(int x, int y, int w, int h, Fl_Color bc)
     }
 
     gleam_color(bc);
-    fl_rectf( x, y + j, x + w - 1, h - j );
+    fl_rectf( x, y + j, w - 1, h - j );
 }
 
 static void frame_rect_up(int x, int y, int w, int h, Fl_Color bc)
