@@ -1,6 +1,7 @@
 
 /*******************************************************************************/
 /* Copyright (C) 2012 Jonathan Moore Liles                                     */
+/* Copyright (C) 2025-Stazed                                                   */
 /*                                                                             */
 /* This program is free software; you can redistribute it and/or modify it     */
 /* under the terms of the GNU General Public License as published by the       */
@@ -160,7 +161,15 @@ Fl_Theme::set ( const char *name )
             return 1;
         }
 
-    return 0;
+    /* If we didn't find the theme then set it to the first item */
+    Fl_Theme *t = first;
+    Fl::reload_scheme();
+    t->_init_func();
+    Fl_Theme::_current = t;
+
+    refresh();
+
+    return 1;
 }
 
 void
