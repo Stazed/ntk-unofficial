@@ -37,13 +37,13 @@ void fl_register_themes ( void )
 
     themes_registered = 1;
 
-    init_cairo_theme();
-    init_clean_theme();
-    init_crystal_theme();
-    init_gleam_theme();
-    init_vector_theme();
     init_vector2_theme();
+    init_vector_theme();
     init_gtk_theme();
+    init_gleam_theme();
+    init_crystal_theme();
+    init_clean_theme();
+    init_cairo_theme();
 
     {
         Fl_Color_Scheme *o = new Fl_Color_Scheme( "Black",
