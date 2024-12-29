@@ -401,6 +401,7 @@ src/Fl_Theme.cxx
 src/Fl_Theme_Chooser.cxx
 src/Cairo_Theme.cxx
 src/Gleam_Theme.cxx
+src/GTK_Theme.cxx
 src/Clean_Theme.cxx
 src/Crystal_Theme.cxx
 src/Vector_Theme.cxx
