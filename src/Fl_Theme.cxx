@@ -28,6 +28,9 @@ Fl_Theme *Fl_Theme::_current;
 Fl_Color_Scheme *Fl_Color_Scheme::first;
 Fl_Color_Scheme *Fl_Color_Scheme::_current;
 
+/* Stored path to app preferences file */
+static std::string s_path;  // .non-mixer-xt, .non-timeline-xt 
+
 int Fl_Theme::total;
 int Fl_Color_Scheme::total;
 
@@ -59,7 +62,10 @@ Fl_Preferences *prefs ( void )
 {
     char path[512];
 
-    snprintf( path, sizeof(path), "%s/.config/ntk/", getenv("HOME" )  );
+    if ( s_path.empty())
+        snprintf( path, sizeof(path), "%s/.config/ntk/", getenv("HOME" )  );    // Use global if no path
+    else
+        snprintf( path, sizeof(path), "%s/.config/%s", getenv("HOME" ), s_path.c_str() );
     
     Fl_Preferences *p = new Fl_Preferences( path, "ntk", "theme" );
 
@@ -114,8 +120,9 @@ conf_get_color ( const char *key, Fl_Color def )
 
 /* sets the configured default */
 int
-Fl_Theme::load_default ( void )
+Fl_Theme::load_default ( std::string path )
 {
+    s_path = path;
     const char *name = conf_get( "theme", "cairo" );
 
     int rv = set( name );
@@ -246,7 +253,12 @@ Fl_Color_Scheme::set ( const char *name )
     return 0;
 }
 
-
-
-
-
+/**
+ * Load the theme based on the path. Allows individual apps to use their own
+ * theme instead of only being able to use the NTK global theme.
+ * @param path
+ *      The path to the individual app preferences file.
+ */
+void fl_apply_theme(std::string path) {
+  Fl_Theme::load_default(path);
+}

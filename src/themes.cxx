@@ -30,9 +30,9 @@
 
 static bool themes_registered = 0;
 
-void fl_register_themes ( void )
+void ntk_register_themes ( std::string path )
 {
-    if ( themes_registered )
+    if ( themes_registered && path.empty() )
         return;
 
     themes_registered = 1;
@@ -125,4 +125,12 @@ void fl_register_themes ( void )
                                                   (Fl_Color)Fl::get_color( FL_SELECTION_COLOR  ));
         Fl_Color_Scheme::add( o );
     }
+
+    /* Get and set the theme for this instance */
+    fl_apply_theme(path);
+}
+
+void fl_register_themes (void )
+{ 
+    ntk_register_themes("");
 }

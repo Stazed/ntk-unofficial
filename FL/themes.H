@@ -1,6 +1,7 @@
 
 /*******************************************************************************/
 /* Copyright (C) 2012 Jonathan Moore Liles                                     */
+/* Copyright (C) 2025-Stazed                                                   */
 /*                                                                             */
 /* This program is free software; you can redistribute it and/or modify it     */
 /* under the terms of the GNU General Public License as published by the       */
@@ -21,4 +22,15 @@
 
 #include "FL/Fl_Theme.H"
 
-void fl_register_themes ( void );
+/**
+ * Application specific theme default setting.
+ * @param path
+ *      The path to the app preferences file.
+ */
+void ntk_register_themes ( std::string path = "" );
+
+/**
+ * Global theme registration, uses global preferences in ~/.config/ntk/
+ */
+void fl_register_themes (void );
+

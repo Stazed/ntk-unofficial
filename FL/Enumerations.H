@@ -4,6 +4,7 @@
 // Enumerations for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2011 by Bill Spitzak and others.
+// Copyright 2025-Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -44,8 +45,17 @@
  */
 /*@{*/
 
+/**
+    Indicates this version if from the "unofficial" NTK library
+    which includes some extended features not available with the
+    "official" version.
+    \sa NTK_EXTENDED
+ */
+#define NTK_EXTENDED 1
+
+/** These are never used FiXME */
 #define NTK_MAJOR_VERSION 1
-#define NTK_MINOR_VERSION 0
+#define NTK_MINOR_VERSION 3
 #define NTK_PATCH_VERSION 0
 
 #define NTK_VERSION		((double)NTK_MAJOR_VERSION + \
