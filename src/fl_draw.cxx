@@ -4,6 +4,7 @@
 // Label drawing code for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2011 by Bill Spitzak and others.
+// Copyright 2025-Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -55,8 +56,13 @@ static char* underline_at;
 #define C_IN(c,a,b) ((c)>=(a) && (c)<=(b)) 
 #define C_UTF8(c)   C_IN(c,0x80,0xBF)
 
+/** Fix compiler warning for Wregister */
+#if __cplusplus > 199711L
+#define register      // Deprecated in C++11.
+#endif  // #if __cplusplus > 199711L
+
 static bool handle_utf8_seq(const char * &s,char * &d) {
-  register const unsigned char* p=(const unsigned char*)s;
+    register const unsigned char* p=(const unsigned char*)s;
   if (p[0] < 0xc2 || p[0] > 0xf4)
     return false; // not adressed in this function
   else if ( C_IN(p[0], 0xc2, 0xdf) && C_UTF8(p[1]) ) {
