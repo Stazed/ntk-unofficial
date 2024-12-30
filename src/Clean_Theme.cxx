@@ -2,6 +2,7 @@
 /*******************************************************************************/
 /* Copyright (C) 2012 Jonathan Moore Liles                                     */
 /* Copyright (C) 2001-2005 by Colin Jones                                      */
+/* Copyright 2025- Stazed                                                      */
 /*                                                                             */
 /* This program is free software; you can redistribute it and/or modify it     */
 /* under the terms of the GNU General Public License as published by the       */
@@ -75,12 +76,12 @@ static void down_box(int x, int y, int w, int h, Fl_Color c)
 	  : c );
     rect(x, y, w, h, border_color( c ));
 }
-
+#if 0
 static void flat_box( int x, int y, int w, int h, Fl_Color c )
 {
     rectf( x, y, w, h, c );
 }
-
+#endif
 static void border_box( int x, int y, int w, int h, Fl_Color c )
 {
     rectf( x, y, w, h, c );
