@@ -4,7 +4,7 @@
 // X specific code for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2011 by Bill Spitzak and others.
-//
+// Copyright 2025- Stazed
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
 // License as published by the Free Software Foundation; either
@@ -1044,6 +1044,40 @@ xembed_maybe_embed_window ( Window parent, Window window )
     return 0;
 }
 
+/*
+  Internal function to reduce "deprecated" warnings for XKeycodeToKeysym().
+  This way we get at most one warning. The option to use XkbKeycodeToKeysym()
+  instead would not help much - see STR #2913 for more information.
+
+  Update (July 22, 2022): disable "deprecated declaration" warnings in
+  this function for GCC >= 4.6 and clang (all versions) to get rid of
+  these warnings at least for current GCC and clang compilers.
+
+  Note: '#pragma GCC diagnostic push' needs at least GCC 4.6.
+*/
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+static KeySym fl_KeycodeToKeysym(Display *d, KeyCode k, unsigned i) {
+  return XKeycodeToKeysym(d, k, i);
+}
+
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 5))
+#pragma GCC diagnostic pop
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 static int fl_handle_xembed ( const XEvent &xevent )
 {
     switch (xevent.type) {
@@ -1535,7 +1569,6 @@ int fl_handle(const XEvent& thisevent)
     fl_key_vector[keycode/8] |= (1 << (keycode%8));
     static char *buffer = NULL;
     static int buffer_len = 0;
-    int len;
     KeySym keysym;
     if (buffer_len == 0) {
       buffer_len = 4096;
@@ -1556,7 +1589,7 @@ int fl_handle(const XEvent& thisevent)
 	  len = XUtf8LookupString(fl_xim_ic, (XKeyPressedEvent *)&xevent.xkey,
 			     buffer, buffer_len, &keysym, &status);
 	}
-	keysym = XKeycodeToKeysym(fl_display, keycode, 0);
+	keysym = fl_KeycodeToKeysym(fl_display, keycode, 0);
       } else {
         //static XComposeStatus compose;
         len = XLookupString((XKeyEvent*)&(xevent.xkey),
@@ -1568,7 +1601,7 @@ int fl_handle(const XEvent& thisevent)
           if (len < 1) len = 1;
           // ignore all effects of shift on the keysyms, which makes it a lot
           // easier to program shortcuts and is Windoze-compatible:
-          keysym = XKeycodeToKeysym(fl_display, keycode, 0);
+          keysym = fl_KeycodeToKeysym(fl_display, keycode, 0);
         }
       }
       // MRS: Can't use Fl::event_state(FL_CTRL) since the state is not
@@ -1614,7 +1647,7 @@ int fl_handle(const XEvent& thisevent)
       event = FL_KEYUP;
       fl_key_vector[keycode/8] &= ~(1 << (keycode%8));
       // keyup events just get the unshifted keysym:
-      keysym = XKeycodeToKeysym(fl_display, keycode, 0);
+      keysym = fl_KeycodeToKeysym(fl_display, keycode, 0);
     }
 #  ifdef __sgi
     // You can plug a microsoft keyboard into an sgi but the extra shift
@@ -1707,7 +1740,7 @@ int fl_handle(const XEvent& thisevent)
     if (keysym >= 0xff91 && keysym <= 0xff9f) {
       // Map keypad keysym to character or keysym depending on
       // numlock state...
-      unsigned long keysym1 = XKeycodeToKeysym(fl_display, keycode, 1);
+      unsigned long keysym1 = fl_KeycodeToKeysym(fl_display, keycode, 1);
       if (keysym1 <= 0x7f || (keysym1 > 0xff9f && keysym1 <= FL_KP_Last))
         Fl::e_original_keysym = (int)(keysym1 | FL_KP);
       if ((xevent.xkey.state & Mod2Mask) &&
@@ -1715,7 +1748,6 @@ int fl_handle(const XEvent& thisevent)
         // Store ASCII numeric keypad value...
         keysym = keysym1 | FL_KP;
         buffer[0] = char(keysym1) & 0x7F;
-        len = 1;
       } else {
         // Map keypad to special key...
         static const unsigned short table[15] = {
@@ -2254,7 +2286,9 @@ void Fl_Window::label(const char *name,const char *iname) {
 // contents are restored to the area, but this assumes the area
 // is cleared to background color.  So this is disabled in this version.
 // Fl_Window *fl_boxcheat;
-static inline int can_boxcheat(uchar b) {return (b==1 || ((b&2) && b<=15));}
+
+/* can_boxcheat is disabled for NTK */
+//static inline int can_boxcheat(uchar b) {return (b==1 || ((b&2) && b<=15));}
 
 void Fl_Window::show() {
   image(Fl::scheme_bg_);
