@@ -4,6 +4,7 @@
 // Preferences methods for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 2002-2010 by Matthias Melcher.
+// Copyright 2025- Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -960,6 +961,7 @@ Fl_Preferences::Name::~Name() {
 
 int Fl_Preferences::Node::lastEntrySet = -1;
 
+#if 0
 // recursively create a path in the file system
 static char makePath( const char *path ) {
   if (access(path, 0)) {
@@ -980,7 +982,6 @@ static char makePath( const char *path ) {
   return 1;
 }
 
-#if 0
 // strip the filename and create a path
 static void makePathForFile( const char *path ) {
   const char *s = strrchr( path, '/' );
@@ -1316,17 +1317,17 @@ int Fl_Preferences::Node::write( FILE *f ) {
     char *src = entry_[i].value;
     if ( src ) {		// hack it into smaller pieces if needed
       fprintf( f, "%s:", entry_[i].name );
-      int cnt, written;
+      size_t cnt, written = 0;
       for ( cnt = 0; cnt < 60; cnt++ )
 	if ( src[cnt]==0 ) break;
-      written = fwrite( src, cnt, 1, f );
+      written += fwrite( src, cnt, 1, f );
       fprintf( f, "\n" );
       src += cnt;
       for (;*src;) {
 	for ( cnt = 0; cnt < 80; cnt++ )
 	  if ( src[cnt]==0 ) break;
         fputc( '+', f );
-	written = fwrite( src, cnt, 1, f );
+	written += fwrite( src, cnt, 1, f );
         fputc( '\n', f );
 	src += cnt;
       }
