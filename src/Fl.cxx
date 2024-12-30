@@ -1434,11 +1434,16 @@ void Fl_Window::hide() {
     fl_window = 0;
 #endif
 
-  if (ip->region) cairo_region_destroy( ip->region ); ip->region = 0;
+  if (ip->region)
+      cairo_region_destroy( ip->region );
+  
+  ip->region = 0;
 
 #if defined(USE_X11)
   if ( ip->cc )
-      cairo_destroy( ip->cc ); ip->cc = 0;
+      cairo_destroy( ip->cc );
+  
+  ip->cc = 0;
 # if USE_XFT
   fl_destroy_xft_draw(ip->xid);
 # endif

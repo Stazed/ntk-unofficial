@@ -528,6 +528,8 @@ int menuwindow::find_selected(int mx, int my) {
   if (!itemheight) { // menubar
     int xx = 3; int n = 0;
     const Fl_Menu_Item* m = menu ? menu->first() : 0;
+    if(!m)
+        return -1;
     for (; ; m = m->next(), n++) {
       if (!m->text) return -1;
       xx += m->measure(0, button) + 16;
@@ -637,7 +639,7 @@ static int forward(int menu) { // go to next item in menu menu if possible
 static int backward(int menu) { // previous item in menu menu if possible
   menustate &pp = *p;
   if (menu == -1)
-      return 0;
+    return 0;
   menuwindow &m = *(pp.p[menu]);
   int item = (menu == pp.menu_number) ? pp.item_number : m.selected;
   if (item < 0) item = m.numitems;

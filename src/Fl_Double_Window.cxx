@@ -436,7 +436,9 @@ void Fl_Double_Window::hide() {
   Fl_X* myi = Fl_X::i(this);
   if (myi && myi->other_xid) {
       if ( myi->other_cc )
-          cairo_destroy( myi->other_cc ); myi->other_cc = 0;
+          cairo_destroy( myi->other_cc );
+      
+      myi->other_cc = 0;
       fl_delete_offscreen(myi->other_xid);
       myi->other_xid = 0;
   }
