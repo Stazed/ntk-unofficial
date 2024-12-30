@@ -5,6 +5,7 @@
 //
 // Copyright 2002 by Greg Ercolano.
 // Copyright (c) 2004 O'ksi'D
+// Copyright 2025- Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -22,10 +23,6 @@
 // USA.
 //
 // Please report all bugs and problems to "erco at seriss dot com".
-//
-// TODO:
-//    o Auto scroll during dragged selection
-//    o Keyboard navigation (up/down/left/right arrow)
 //
 
 #ifndef _FL_TABLE_H
@@ -107,7 +104,7 @@
  <td>The table's inner dimension. The inner edge of the border around the cells,
  but inside the row/col headings and scrollbars. AKA the table's clip region. 
  eg. if the table_box() is FL_NO_BOX, these values are the same as
- tox/toyy/tow/toh. (Blue in the diagram above)
+ tox/toy/tow/toh. (Blue in the diagram above)
  </td></tr></table>
  
  CORE DEVELOPERS
@@ -181,7 +178,9 @@
 class FL_EXPORT Fl_Table : public Fl_Group {
 public:
   /**
-   The context bit flags for Fl_Table related callbacks (eg. draw_cell(), callback(), etc)
+   The context bit flags for Fl_Table related callbacks.
+
+   Used in draw_cell(), callback(), etc.
    */
   enum TableContext {
     CONTEXT_NONE       = 0,	///< no known context
@@ -397,11 +396,11 @@ protected:
        static char s[40];
        sprintf(s, "%d/%d", R, C);              // text for each cell
        switch ( context ) {
-	   case CONTEXT_STARTPAGE:             // Fl_Table telling us its starting to draw page
+	   case CONTEXT_STARTPAGE:             // Fl_Table telling us it's starting to draw page
 	       fl_font(FL_HELVETICA, 16);
 	       return;
        
-	   case CONTEXT_ROW_HEADER:            // Fl_Table telling us it's draw row/col headers
+	   case CONTEXT_ROW_HEADER:            // Fl_Table telling us to draw row/col headers
 	   case CONTEXT_COL_HEADER:
 	       fl_push_clip(X, Y, W, H);
 	       {
@@ -452,19 +451,19 @@ protected:
   
   void damage_zone(int r1, int c1, int r2, int c2, int r3 = 0, int c3 = 0);
   
-  void redraw_range(int toprow, int botrow, int leftcol, int rightcol) {
+  void redraw_range(int topRow, int botRow, int leftCol, int rightCol) {
     if ( _redraw_toprow == -1 ) {
       // Initialize redraw range
-      _redraw_toprow = toprow;
-      _redraw_botrow = botrow;
-      _redraw_leftcol = leftcol;
-      _redraw_rightcol = rightcol;
+      _redraw_toprow = topRow;
+      _redraw_botrow = botRow;
+      _redraw_leftcol = leftCol;
+      _redraw_rightcol = rightCol;
     } else {
       // Extend redraw range
-      if ( toprow < _redraw_toprow ) _redraw_toprow = toprow;
-      if ( botrow > _redraw_botrow ) _redraw_botrow = botrow;
-      if ( leftcol < _redraw_leftcol ) _redraw_leftcol = leftcol;
-      if ( rightcol > _redraw_rightcol ) _redraw_rightcol = rightcol;
+      if ( topRow < _redraw_toprow ) _redraw_toprow = topRow;
+      if ( botRow > _redraw_botrow ) _redraw_botrow = botRow;
+      if ( leftCol < _redraw_leftcol ) _redraw_leftcol = leftCol;
+      if ( rightCol > _redraw_rightcol ) _redraw_rightcol = rightCol;
     }
     
     // Indicate partial redraw needed of some cells
@@ -486,11 +485,11 @@ public:
   ~Fl_Table();
   
   /**
-   Clears the table to zero rows, zero columns.
-   Same as rows(0); cols(0);
+   Clears the table to zero rows (rows(0)), zero columns (cols(0)), and clears
+   any widgets (table->clear()) that were added with begin()/end() or add()/insert()/etc.
    \see rows(int), cols(int)
    */
-  virtual void clear() { rows(0); cols(0); }
+  virtual void clear() { rows(0); cols(0); table->clear(); }
   
   // \todo: add topline(), middleline(), bottomline()
   
@@ -579,7 +578,7 @@ public:
   } 
   
   /**
-   Returns the current value of this flag.
+   Returns if row resizing by the user is allowed.
    */
   inline int row_resize() {
     return(_row_resize);
@@ -596,7 +595,7 @@ public:
   }
   
   /**
-   Returns the current value of this flag.
+   Returns if column resizing by the user is allowed.
    */
   inline int col_resize() {
     return(_col_resize);
@@ -612,16 +611,16 @@ public:
   }
   
   /**
-   Sets the current column minimum resize value.
-   This is used to prevent the user from interactively resizing
-   any column to be smaller than 'pixels'. Must be a value >=1.
+   Returns the current column minimum resize value.
    */
   inline int col_resize_min() {			// column minimum resizing width
     return(_col_resize_min);
   }
   
   /**
-   Returns the current column minimum resize value.
+   Sets the current column minimum resize value.
+   This is used to prevent the user from interactively resizing
+   any column to be smaller than 'pixels'. Must be a value >=1.
    */
   void col_resize_min(int val) {
     _col_resize_min = ( val < 1 ) ? 1 : val;
@@ -644,7 +643,7 @@ public:
   }
   
   /**
-   Returns the value of this flag.
+   Returns if row headers are enabled or not.
    */
   inline int row_header() {			// set/get row header enable flag
     return(_row_header);
@@ -831,6 +830,7 @@ public:
   int is_selected(int r, int c);		// selected cell
   void get_selection(int &row_top, int &col_left, int &row_bot, int &col_right);
   void set_selection(int row_top, int col_left, int row_bot, int col_right);
+  int move_cursor(int R, int C, int shiftselect);
   int move_cursor(int R, int C);
   
   /**
@@ -855,20 +855,25 @@ public:
     table->init_sizes();
     table->redraw();
   }
-  void add(Fl_Widget& w) {
-    table->add(w);
+  void add(Fl_Widget& wgt) {
+    table->add(wgt);
+    if ( table->children() > 2 ) {
+      table->show();
+    } else {
+      table->hide();
+    } 
   }
-  void add(Fl_Widget* w) {
-    table->add(w);
+  void add(Fl_Widget* wgt) {
+    add(*wgt);
   }
-  void insert(Fl_Widget& w, int n) {
-    table->insert(w,n);
+  void insert(Fl_Widget& wgt, int n) {
+    table->insert(wgt,n);
   }
-  void insert(Fl_Widget& w, Fl_Widget* w2) {
-    table->insert(w,w2);
+  void insert(Fl_Widget& wgt, Fl_Widget* w2) {
+    table->insert(wgt,w2);
   }
-  void remove(Fl_Widget& w) {
-    table->remove(w);
+  void remove(Fl_Widget& wgt) {
+    table->remove(wgt);
   }
   void begin() {
     table->begin();
@@ -918,18 +923,18 @@ public:
   int children() const {
     return(table->children()-2);    // -2: skip Fl_Scroll's h/v scrollbar widgets
   }
-  int find(const Fl_Widget *w) const {
-    return(table->find(w));
+  int find(const Fl_Widget *wgt) const {
+    return(table->find(wgt));
   }
-  int find(const Fl_Widget &w) const {
-    return(table->find(w));
+  int find(const Fl_Widget &wgt) const {
+    return(table->find(wgt));
   } 
   // CALLBACKS
   
   /**
    * Returns the current row the event occurred on.
    *
-   * This function should only be used from within the user's callback function
+   * This function should only be used from within the user's callback function.
    */
   int callback_row() {
     return(_callback_row);
@@ -938,7 +943,7 @@ public:
   /**
    * Returns the current column the event occurred on.
    *
-   * This function should only be used from within the user's callback function
+   * This function should only be used from within the user's callback function.
    */
   int callback_col() {
     return(_callback_col);
@@ -947,7 +952,7 @@ public:
   /**
    * Returns the current 'table context'.
    *
-   * This function should only be used from within the user's callback function
+   * This function should only be used from within the user's callback function.
    */
   TableContext callback_context() {
     return(_callback_context);
@@ -960,7 +965,7 @@ public:
     Fl_Widget::do_callback();
   }
   
-#if FL_DOXYGEN
+#ifdef FL_DOXYGEN
   /**
    The Fl_Widget::when() function is used to set a group of flags, determining
    when the widget callback is called:
@@ -981,28 +986,28 @@ public:
    </td>
    </tr>
    </table>
-   
-   The callback() routine is sent a TableContext that indicates the context the 
-   event occurred in, such as in a cell, in a header, or elsewhere on the table.  
-   When an event occurs in a cell or header, callback_row() and 
-   callback_col() can be used to determine the row and column. The callback can 
-   also look at the regular fltk event values (ie. Fl::event() and Fl::button()) 
-   to determine what kind of event is occurring.
+
+   The callback() routine is sent a TableContext that indicates the context the
+   event occurred in, such as in a cell, in a header, or elsewhere on the table.
+   When an event occurs in a cell or header, callback_row() and
+   callback_col() can be used to determine the row and column. The callback
+   can also look at the regular fltk event values (ie. Fl::event() and
+   Fl::event_button()) to determine what kind of event is occurring.
    */
   void when(Fl_When flags);
 #endif
   
-#if FL_DOXYGEN
+#ifdef FL_DOXYGEN
   /**
    Callbacks will be called depending on the setting of Fl_Widget::when().
    
    Callback functions should use the following functions to determine the 
    context/row/column:
-   
-   * Fl_Table::callback_row() returns current row
-   * Fl_Table::callback_col() returns current column
-   * Fl_Table::callback_context() returns current table context
-   
+
+   - Fl_Table::callback_row() returns current row
+   - Fl_Table::callback_col() returns current column
+   - Fl_Table::callback_context() returns current table context
+
    callback_row() and callback_col() will be set to the row and column number the 
    event occurred on. If someone clicked on a row header, \p col will be \a 0.  
    If someone clicked on a column header, \p row will be \a 0.
@@ -1057,7 +1062,7 @@ public:
      // Actual static callback
      static void event_callback(Fl_Widget*, void* data) {
        MyTable *o = (MyTable*)data;
-       o-&gt;event_callback2();
+       o->event_callback2();
      }
      
    public:

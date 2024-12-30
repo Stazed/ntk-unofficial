@@ -12,6 +12,7 @@
 //    Handles row-specific selection behavior.
 //
 // Copyright 2002 by Greg Ercolano.
+// Copyright 2025- Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -98,7 +99,7 @@ private:
       return(_size);
     }
     void size(int count) {
-      if ( count != _size ) {
+      if ( count > 0 && count != _size ) {
         arr = (char*)realloc(arr, count * sizeof(char));
         _size = count;
       }
