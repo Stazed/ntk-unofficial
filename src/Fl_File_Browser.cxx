@@ -4,6 +4,7 @@
 // Fl_File_Browser routines.
 //
 // Copyright 1999-2010 by Michael Sweet.
+// Copyright 2025- Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -358,7 +359,10 @@ Fl_File_Browser::item_draw(void *p,	// I - List item data
       if (columns)
       {
         // Try clipping inside this column...
-	for (i = 0; i < column && columns[i]; i ++);
+	for (i = 0; i < column && columns[i]; i ++)
+        {
+            // nothing
+        }
 
         if (columns[i])
           cW = columns[i];
