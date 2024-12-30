@@ -4,6 +4,7 @@
 // Image drawing code for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2010 by Bill Spitzak and others.
+// Copyright 2025-Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -237,7 +238,7 @@ Fl_Image *Fl_RGB_Image::copy(int W, int H) {
   new_image->alloc_array = 1;
 
   
-  cairo_format_t fmt;
+  cairo_format_t fmt = CAIRO_FORMAT_ARGB32;
   
   switch (d() )
   {

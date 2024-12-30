@@ -1,24 +1,15 @@
 //
-// "$Id: Fl_Browser.H 8623 2011-04-24 17:09:41Z AlbrechtS $"
+// "$Id$"
 //
 // Browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2011 by Bill Spitzak and others.
+// Copyright 1998-2016 by Bill Spitzak and others.
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Library General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
+// This library is free software. Distribution and use rights are outlined in
+// the file "COPYING" which should have been included with this file.  If this
+// file is missing or damaged, see the license at:
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-// USA.
+//     http://www.fltk.org/COPYING.php
 //
 // Please report all bugs and problems on the following page:
 //
@@ -134,7 +125,6 @@ public:
 
   int full_height() const ;
   int incr_height() const ;
-
   void remove(int line);
   void add(const char* newtext, void* d = 0);
   void insert(int line, const char* newtext, void* d = 0);
@@ -150,6 +140,17 @@ public:
   */
   int size() const { return lines; }
   void size(int W, int H) { Fl_Widget::size(W, H); }
+
+  /**
+    Gets the default text size (in pixels) for the lines in the browser.
+  */
+  Fl_Fontsize textsize() const { return Fl_Browser_::textsize(); }
+
+  /*
+    Sets the default text size for the lines in the browser to newSize.
+    Defined and documented in Fl_Browser.cxx
+  */
+  void textsize(Fl_Fontsize newSize);
 
   int topline() const ;
   /** For internal use only? */
@@ -267,7 +268,7 @@ public:
     Example:
     \code
   Fl_Browser *b = new Fl_Browser(..);
-  int widths[] = { 50, 50, 50, 70, 70, 40, 40, 70, 70, 50, 0 };  // widths for each column
+  static int widths[] = { 50, 50, 50, 70, 70, 40, 40, 70, 70, 50, 0 };  // widths for each column
   b->column_widths(widths); // assign array to widget
   b->column_char('\t');     // use tab as the column character
   b->add("USER\tPID\tCPU\tMEM\tVSZ\tRSS\tTTY\tSTAT\tSTART\tTIME\tCOMMAND");
@@ -321,5 +322,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Browser.H 8623 2011-04-24 17:09:41Z AlbrechtS $".
+// End of "$Id$".
 //

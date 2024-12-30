@@ -1,24 +1,15 @@
 //
-// "$Id: Fl_Browser.cxx 8736 2011-05-24 20:00:56Z AlbrechtS $"
+// "$Id$"
 //
 // Browser widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2010 by Bill Spitzak and others.
+// Copyright 1998-2016 by Bill Spitzak and others.
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Library General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
+// This library is free software. Distribution and use rights are outlined in
+// the file "COPYING" which should have been included with this file.  If this
+// file is missing or damaged, see the license at:
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-// USA.
+//     http://www.fltk.org/COPYING.php
 //
 // Please report all bugs and problems on the following page:
 //
@@ -32,11 +23,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-#if defined(FL_DLL)	// really needed for c'tors for MS VC++ only
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Select_Browser.H>
-#endif
+
 
 // I modified this from the original Forms data to use a linked list
 // so that the number of items in the browser and size of those items
@@ -90,7 +80,7 @@ void* Fl_Browser::item_next(void* item) const {return ((FL_BLINE*)item)->next;}
 /**
   Returns the previous item before \p item.
   \param[in] item The 'current' item
-  \returns The previous item before \p item, or NULL if there none before this one.
+  \returns The previous item before \p item, or NULL if there are none before this one.
   \see item_first(), item_last(), item_next(), item_prev()
 */
 void* Fl_Browser::item_prev(void* item) const {return ((FL_BLINE*)item)->prev;}
@@ -294,7 +284,8 @@ void Fl_Browser::insert(int line, FL_BLINE* item) {
   \param[in] d Optional pointer to user data to be associated with the new line.
 */
 void Fl_Browser::insert(int line, const char* newtext, void* d) {
-  int l = strlen(newtext);
+  if (!newtext) newtext = "";		// STR #3269
+  int l = (int) strlen(newtext);
   FL_BLINE* t = (FL_BLINE*)malloc(sizeof(FL_BLINE)+l);
   t->length = (short)l;
   t->flags = 0;
@@ -329,7 +320,8 @@ void Fl_Browser::move(int to, int from) {
 void Fl_Browser::text(int line, const char* newtext) {
   if (line < 1 || line > lines) return;
   FL_BLINE* t = find_line(line);
-  int l = strlen(newtext);
+  if (!newtext) newtext = "";		// STR #3269
+  int l = (int) strlen(newtext);
   if (l > t->length) {
     FL_BLINE* n = (FL_BLINE*)malloc(sizeof(FL_BLINE)+l);
     replacing(t, n);
@@ -381,7 +373,6 @@ int Fl_Browser::item_height(void *item) const {
     if (hh > hmax) hmax = hh;
   } else {
     const int* i = column_widths();
-    long int dummy;
     // do each column separately as they may all set different fonts:
     for (char* str = l->txt; str && *str; str++) {
       Fl_Font font = textfont(); // default font
@@ -396,7 +387,7 @@ int Fl_Browser::item_height(void *item) const {
 	case 'i': font = (Fl_Font)(font|FL_ITALIC); break;
 	case 'f': case 't': font = FL_COURIER; break;
 	case 'B':
-	case 'C': dummy = strtol(str, &str, 10); break;// skip a color number
+	case 'C': while (isdigit(*str & 255)) str++; break; // skip a color number
 	case 'F': font = (Fl_Font)strtol(str,&str,10); break;
 	case 'S': tsize = strtol(str,&str,10); break;
 	case 0: case '@': str--;
@@ -449,7 +440,6 @@ int Fl_Browser::item_width(void *item) const {
   int done = 0;
 
   while (*str == format_char_ && str[1] && str[1] != format_char_) {
-    long int dummy;
     str ++;
     switch (*str++) {
     case 'l': case 'L': tsize = 24; break;
@@ -459,7 +449,7 @@ int Fl_Browser::item_width(void *item) const {
     case 'i': font = (Fl_Font)(font|FL_ITALIC); break;
     case 'f': case 't': font = FL_COURIER; break;
     case 'B':
-    case 'C': dummy = strtol(str, &str, 10); break;// skip a color number
+    case 'C': while (isdigit(*str & 255)) str++; break; // skip a color number
     case 'F': font = (Fl_Font)strtol(str, &str, 10); break;
     case 'S': tsize = strtol(str, &str, 10); break;
     case '.':
@@ -544,7 +534,6 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
     //#warning FIXME This maybe needs to be more UTF8 aware now...?
     //#endif /*__GNUC__*/
     while (*str == format_char() && *++str && *str != format_char()) {
-      long int dummy;
       switch (*str++) {
       case 'l': case 'L': tsize = 24; break;
       case 'm': case 'M': tsize = 18; break;
@@ -556,12 +545,12 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
       case 'r': talign = FL_ALIGN_RIGHT; break;
       case 'B': 
 	if (!(l->flags & SELECTED)) {
-	  fl_color((Fl_Color)strtol(str, &str, 10));
+	  fl_color((Fl_Color)strtoul(str, &str, 10));
 	  fl_rectf(X, Y, w1, H);
-	} else dummy = strtol(str, &str, 10);
+	} else while (isdigit(*str & 255)) str++; // skip digits
         break;
       case 'C':
-	lcol = (Fl_Color)strtol(str, &str, 10);
+	lcol = (Fl_Color)strtoul(str, &str, 10);
 	break;
       case 'F':
 	font = (Fl_Font)strtol(str, &str, 10);
@@ -659,6 +648,34 @@ void Fl_Browser::lineposition(int line, Fl_Line_Position pos) {
 */
 int Fl_Browser::topline() const {
   return lineno(top());
+}
+
+/**
+  Sets the default text size (in pixels) for the lines in the browser to \p newSize.
+
+  This method recalculates all item heights and caches the total height
+  internally for optimization of later item changes. This can be slow
+  if there are many items in the browser.
+
+  It returns immediately (w/o recalculation) if \p newSize equals
+  the current textsize().
+
+  You \e may need to call redraw() to see the effect and to have the
+  scrollbar positions recalculated.
+
+  You should set the text size \e before populating the browser with items
+  unless you really need to \e change the size later.
+*/
+void Fl_Browser::textsize(Fl_Fontsize newSize) {
+  if (newSize == textsize())
+    return; // avoid recalculation
+  Fl_Browser_::textsize(newSize);
+  new_list();
+  full_height_ = 0;
+  if (lines == 0) return;
+  for (FL_BLINE* itm=(FL_BLINE *)item_first(); itm; itm=(FL_BLINE *)item_next(itm)) {
+    full_height_ += item_height(itm);
+  }
 }
 
 /**
@@ -802,7 +819,7 @@ int Fl_Browser::visible(int line) const {
 }
 
 /**
-  Returns the line number of the currently selected line, or 0 if none.
+  Returns the line number of the currently selected line, or 0 if none selected.
   \returns The line number of current selection, or 0 if none selected.
   \see select(), selected(), value(), item_select(), item_selected()
 */
@@ -920,30 +937,28 @@ void Fl_Browser::remove_icon(int line) {
   icon(line,0);
 }
 
-/*
-  The following constructors must not be in the header file(s) if we
-  build a shared object (DLL). Instead they are defined here to force
-  the constructor (and default destructor as well) to be defined in
-  the DLL and exported (STR #2632, #2645).
-  
-  Note: if you change any of them, do the same changes in the specific
-  header file as well.  This redundant definition was chosen to enable
-  inline constructors in the header files (for static linking) as well
-  as those here for dynamic linking (Windows DLL).
-*/
-#if defined(FL_DLL)
 
-  Fl_Hold_Browser::Fl_Hold_Browser(int X,int Y,int W,int H,const char *L)
-	: Fl_Browser(X,Y,W,H,L) {type(FL_HOLD_BROWSER);}
+Fl_Hold_Browser::Fl_Hold_Browser(int X,int Y,int W,int H,const char *L)
+: Fl_Browser(X,Y,W,H,L) 
+{
+  type(FL_HOLD_BROWSER);
+}
 
-  Fl_Multi_Browser::Fl_Multi_Browser(int X,int Y,int W,int H,const char *L)
-	: Fl_Browser(X,Y,W,H,L) {type(FL_MULTI_BROWSER);}
 
-  Fl_Select_Browser::Fl_Select_Browser(int X,int Y,int W,int H,const char *L)
-	: Fl_Browser(X,Y,W,H,L) {type(FL_SELECT_BROWSER);}
+Fl_Multi_Browser::Fl_Multi_Browser(int X,int Y,int W,int H,const char *L)
+: Fl_Browser(X,Y,W,H,L) 
+{
+  type(FL_MULTI_BROWSER);
+}
 
-#endif // FL_DLL
+
+Fl_Select_Browser::Fl_Select_Browser(int X,int Y,int W,int H,const char *L)
+: Fl_Browser(X,Y,W,H,L) 
+{
+  type(FL_SELECT_BROWSER);
+}
+
 
 //
-// End of "$Id: Fl_Browser.cxx 8736 2011-05-24 20:00:56Z AlbrechtS $".
+// End of "$Id$".
 //
