@@ -4,6 +4,7 @@
 // Standard dialog functions for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2011 by Bill Spitzak and others.
+// Copyright 2025-Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -46,6 +47,7 @@
 #include <FL/Fl_Secret_Input.H>
 #include <FL/x.H>
 #include <FL/fl_draw.H>
+#include <cstdint>
 
 static Fl_Window *message_form;
 static Fl_Box *message;
@@ -101,7 +103,7 @@ static Fl_Window *makeform() {
  }
  w->end(); // don't add the buttons automatically
  // create the buttons (right to left)
- for (int b=0, x=310; b<3; b++, x -= 100) {
+ for (intptr_t b=0, x=310; b<3; b++, x -= 100) {
    if (b==1)
      button[b] = new Fl_Return_Button(x, 70, 90, 23);
    else
