@@ -6,6 +6,7 @@
 // KDE icon code donated by Maarten De Boer.
 //
 // Copyright 1999-2010 by Michael Sweet.
+// Copyright 2025-Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -600,7 +601,7 @@ void
 Fl_File_Icon::load_system_icons(void) {
   int		i;		// Looping var
   Fl_File_Icon	*icon;		// New icons
-  char		filename[FL_PATH_MAX];	// Filename
+  char		filename[FL_PATH_MAX + 60];	// Filename
   char		icondir[FL_PATH_MAX];	// Icon directory
   static int	init = 0;	// Have the icons been initialized?
   const char * const icondirs[] = {
