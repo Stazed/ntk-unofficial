@@ -91,7 +91,8 @@ static int scroll_x = 0;
  */
 Fl_Text_Display::Fl_Text_Display(int X, int Y, int W, int H, const char* l)
 : Fl_Group(X, Y, W, H, l) {
-  int i;
+
+#define VISIBLE_LINES_INIT 1 // allow compiler to remove unused code (PR #582)
   
   mMaxsize = 0;
   damage_range1_start = damage_range1_end = -1;
@@ -144,11 +145,14 @@ Fl_Text_Display::Fl_Text_Display(int X, int Y, int W, int H, const char* l)
   mStyleBuffer = 0;
   mStyleTable = 0;
   mNStyles = 0;
-  mNVisibleLines = 1;
+  mNVisibleLines = VISIBLE_LINES_INIT;
   mLineStarts = new int[mNVisibleLines];
   mLineStarts[0] = 0;
-  for (i=1; i<mNVisibleLines; i++)
-    mLineStarts[i] = -1;
+#if VISIBLE_LINES_INIT > 1
+  { // Note: this code is unused unless mNVisibleLines is ever initialized > 1
+    for (int i=1; i<mNVisibleLines; i++) mLineStarts[i] = -1;
+  }
+#endif
   mSuppressResync = 0;
   mNLinesDeleted = 0;
   mModifyingTabDistance = 0;
@@ -811,7 +815,7 @@ void Fl_Text_Display::overstrike(const char* text) {
 int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) const {
   IS_UTF8_ALIGNED2(buffer(), pos)
 
-  int lineStartPos, fontHeight, lineLen;
+  int lineStartPos, fontHeight; /* , lineLen; */
   int visLineNum;
   
   /* If position is not displayed, return false */
@@ -838,7 +842,7 @@ int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) const {
     *X = text_area.x - mHorizOffset;
     return 1;
   }
-  lineLen = vline_length( visLineNum );
+  /* lineLen = */ vline_length( visLineNum );
   *X = text_area.x + handle_vline(GET_WIDTH, lineStartPos, pos-lineStartPos, 0, 0, 0, 0, 0, 0) - mHorizOffset;
   return 1;
 }
@@ -2970,7 +2974,7 @@ void Fl_Text_Display::measure_deleted_lines(int pos, int nDeleted) {
   int nVisLines = mNVisibleLines;
   int *lineStarts = mLineStarts;
   int countFrom, lineStart;
-  int visLineNum = 0, nLines = 0, i;
+  int nLines = 0, i;
   /*
    ** Determine where to begin searching: either the previous newline, or
    ** if possible, limit to the start of the (original) previous displayed
@@ -2982,12 +2986,11 @@ void Fl_Text_Display::measure_deleted_lines(int pos, int nDeleted) {
         break;
     if (i > 0) {
       countFrom = lineStarts[i-1];
-      visLineNum = i-1;
     } else
       countFrom = buf->line_start(pos);
   } else
     countFrom = buf->line_start(pos);
-  
+
   /*
    ** Move forward through the (new) text one line at a time, counting
    ** displayed lines, and looking for either a real newline, or for the
@@ -3009,15 +3012,15 @@ void Fl_Text_Display::measure_deleted_lines(int pos, int nDeleted) {
     if (lineStart > pos + nDeleted && buf->char_at(lineStart-1) == '\n') {
       break;
     }
-    
-    /* Unlike in the findWrapRange() function above, we don't try to 
-     resync with the line starts, because we don't know the length 
-     of the inserted text yet, nor the updated style information. 
-     
+
+    /* Unlike in the findWrapRange() function above, we don't try to
+     resync with the line starts, because we don't know the length
+     of the inserted text yet, nor the updated style information.
+
      Because of that, we also shouldn't resync with the line starts
      after the modification either, because we must perform the
-     calculations for the deleted and inserted lines in the same way. 
-     
+     calculations for the deleted and inserted lines in the same way.
+
      This can result in some unnecessary recalculation and redrawing
      overhead, and therefore we should only use this two-phase mode
      of calculation when it's really needed (continuous wrap + variable
