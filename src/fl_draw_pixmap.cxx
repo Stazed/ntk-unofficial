@@ -4,6 +4,7 @@
 // Pixmap drawing code for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2010 by Bill Spitzak and others.
+// Copyright 2025=Stazed
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -218,8 +219,8 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
   if (!fl_measure_pixmap(cdata, d.w, d.h)) return 0;
   const uchar*const* data = (const uchar*const*)(cdata+1);
   int transparent_index = -1;
-  uchar *transparent_c = (uchar *)0; // such that transparent_c[0,1,2] are the RGB of the transparent color
 #ifdef WIN32
+  uchar *transparent_c = (uchar *)0; // such that transparent_c[0,1,2] are the RGB of the transparent color
   color_count = 0;
   used_colors = (uchar *)malloc(abs(ncolors)*3*sizeof(uchar));
 #endif
@@ -239,7 +240,9 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
 #endif
       transparent_index = ' ';
       Fl::get_color(bg, c[0], c[1], c[2]); c[3] = 0;
+#ifdef WIN32
       transparent_c = c;
+#endif
       p += 4;
       ncolors--;
     }
@@ -325,7 +328,9 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
         c[3] = 0;
 #endif
 	transparent_index = ind;
+#ifdef WIN32
 	transparent_c = c;
+#endif
       }
     }
   }
