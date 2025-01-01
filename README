@@ -41,7 +41,7 @@ Building and installing generally goes like:
 
      ./waf configure
      ./waf
-      su -c './waf install'
+     sudo ./waf install
 
 # Usage #
 
@@ -59,9 +59,12 @@ add to the LD_LIBRARY_PATH.
 
      export LD_LIBRARY_PATH=/usr/local/lib
      export LD_LIBRARY_PATH=/usr/local/lib64
+ 
+You can add the above export commands to your ~.bashrc file to make them permanent. If you choose to install NTK
+to /usr/ instead of /usr/local/ it will not be necessary to set the export commands.
 
-For building with static libraries, you may need the following for proper linking.
-
-    export CPLUS_INCLUDE_PATH="/usr/local/include/ntk/:$CPLUS_INCLUDE_PATH"
-    export C_INCLUDE_PATH="/usr/local/include/ntk/:$C_INCLUDE_PATH"
+Use the following commands to install to /usr/:
+    ./waf configure --prefix=/usr/
+    ./waf
+    sudo ./waf install
 
