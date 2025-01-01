@@ -1,5 +1,7 @@
-This is an UNOFFICIAL fork of NTK with some minor fixes and updates.
+This is an UNOFFICIAL fork of NTK with some minor fixes and updates and is ABI compatible.
 See the git commit history for changes.
+Installing this fork will replace any existing official NTK installation in the same location.
+Use at your own risk!
 
 # What is NTK? #
 
@@ -39,7 +41,7 @@ to see compilation options.
 
 Building and installing generally goes like:
 
-     ./waf configure
+     ./waf configure --libdir=/usr/local/lib/
      ./waf
      sudo ./waf install
 
@@ -47,23 +49,22 @@ Building and installing generally goes like:
 
 NTK uses pkg-config for publishing library information.
 
-If your pkg-config cannot find the library which is installed by default to: /usr/local/lib or /usr/local/lib64
-and the *.pc files in folder: /usr/local/lib/pkgconfig or /usr/local/lib64/pkgconfig you may need to add to the PKG_CONFIG_PATH.
-These locations may be different depending on your distribution, or can be changed with waf.
+If your pkg-config cannot find the library which is installed by default to: /usr/local/lib
+and the *.pc files in folder /usr/local/lib/pkgconfig you may need to add to the PKG_CONFIG_PATH:
 
      export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-     export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH
-     
+
 If you have a runtime error indicating that the libntk*.so cannot be found then you may need to
-add to the LD_LIBRARY_PATH.
+add to the LD_LIBRARY_PATH:
 
      export LD_LIBRARY_PATH=/usr/local/lib
-     export LD_LIBRARY_PATH=/usr/local/lib64
- 
-You can add the above export commands to your ~.bashrc file to make them permanent. If you choose to install NTK
-to /usr/ instead of /usr/local/ it will not be necessary to set the export commands.
+
+You can add the above export commands to your ~.bashrc file to make them permanent.
+The installation locations can be changed with waf.
+If you wish to install NTK to /usr/ instead of /usr/local/ it will not be necessary to set the export commands.
 
 Use the following commands to install to /usr/:
+
     ./waf configure --prefix=/usr/ --libdir=/usr/lib/
     ./waf
     sudo ./waf install
