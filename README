@@ -64,7 +64,7 @@ You can add the above export commands to your ~.bashrc file to make them permane
 to /usr/ instead of /usr/local/ it will not be necessary to set the export commands.
 
 Use the following commands to install to /usr/:
-    ./waf configure --prefix=/usr/
+    ./waf configure --prefix=/usr/ --libdir=/usr/lib/
     ./waf
     sudo ./waf install
 
