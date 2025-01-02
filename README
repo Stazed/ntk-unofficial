@@ -39,7 +39,12 @@ NTK uses the 'waf' build system.
          
 to see compilation options.
 
-Building and installing generally goes like:
+# Building and installing #
+
+It is recommended that this unofficial version be installed to /usr/ rather than the default location of /usr/local/.
+Doing so will replace any system installed version of NTK if it is packaged by your distribution. If you choose to install to /usr/local/, it may require setting of environment variables (PKG_CONFIG_PATH and LD_LIBRARY_PATH) and has been found to cause runtime anomalies. Installing to /usr/local/ is not supported for this unofficial version.
+
+To install to /usr/ use the following:
 
     ./waf configure --prefix=/usr/ --libdir=/usr/lib/
     ./waf
