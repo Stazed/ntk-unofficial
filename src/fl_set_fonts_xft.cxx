@@ -1,24 +1,15 @@
 //
-// "$Id: fl_set_fonts_xft.cxx 7913 2010-11-29 18:18:27Z greg.ercolano $"
+// "$Id$"
 //
 // More font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2010 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Library General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
+// This library is free software. Distribution and use rights are outlined in
+// the file "COPYING" which should have been included with this file.  If this
+// file is missing or damaged, see the license at:
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-// USA.
+//     http://www.fltk.org/COPYING.php
 //
 // Please report all bugs and problems on the following page:
 //
@@ -38,7 +29,7 @@
 // of the font name array.
 #define ENDOFBUFFER 127 // sizeof(Fl_Font.fontname)-1
 
-// turn a stored font name into a pretty name:
+// turn a stored font name in "fltk format" into a pretty name:
 const char* Fl::get_font_name(Fl_Font fnum, int* ap) {
   Fl_Fontdesc *f = fl_fonts + fnum;
   if (!f->fontname[0]) {
@@ -74,7 +65,7 @@ static int name_sort(const void *aa, const void *bb) {
   // Also - the fontconfig listing returns some faces that are effectively duplicates
   // as far as fltk is concerned, e.g. where there are ko or ja variants that we
   // can't distinguish (since we are not yet fully UTF-*) - should we strip them here?
-  return strcasecmp(*(char**)aa, *(char**)bb);
+  return fl_ascii_strcasecmp(*(char**)aa, *(char**)bb);
 } // end of name_sort
 } // end of extern C section
 
@@ -91,7 +82,6 @@ static void make_raw_name(char *raw, char *pretty)
   //   italic, bold, bold italic or normal - this seems to be the fltk way...
 
   char *style = strchr(pretty, ':');
-  char *last = style + strlen(style) - 2;
 
   if (style)
   {
@@ -111,12 +101,16 @@ static void make_raw_name(char *raw, char *pretty)
     nm2 = strchr(nm1, ',');
   }
   raw[0] = ' '; raw[1] = 0; // Default start of "raw name" text
-  strncat(raw, nm1, LOCAL_RAW_NAME_MAX);
+  strncat(raw, nm1, LOCAL_RAW_NAME_MAX-1); // only copy MAX-1 chars, we have already set cell 0
+  // Ensure raw is terminated, just in case the given name is infeasibly long...
+  raw[LOCAL_RAW_NAME_MAX-1] = 0;
 #else // keep the first remaining name entry
   char *nm2 = strchr(pretty, ',');
   if(nm2) *nm2 = 0; // terminate name after first entry
   raw[0] = ' '; raw[1] = 0; // Default start of "raw name" text
-  strncat(raw, pretty, LOCAL_RAW_NAME_MAX-1);
+  strncat(raw, pretty, LOCAL_RAW_NAME_MAX-1); // only copy MAX-1 chars, we have already set cell 0
+  // Ensure raw is terminated, just in case the given name is infeasibly long...
+  raw[LOCAL_RAW_NAME_MAX-1] = 0;
 #endif
   // At this point, the name is "marked" as regular...
   if (style)
@@ -125,13 +119,16 @@ static void make_raw_name(char *raw, char *pretty)
 #define BOLD    1
 #define ITALIC  2
 #define BITALIC (BOLD | ITALIC)
+
     int mods = PLAIN;
+    char *last = style + strlen(style) - 2;
+
     // Now try and parse the style string - look for the "=" sign
     style = strchr(style, '=');
     while ((style) && (style < last))
     {
       int type;
-      while ((*style == '=') || (*style == ' ') || (*style == '\t'))
+      while ((*style == '=') || (*style == ' ') || (*style == '\t') || (*style == ','))
       {
         style++; // Start of Style string
         if ((style >= last) || (*style == 0)) continue;
@@ -162,19 +159,19 @@ static void make_raw_name(char *raw, char *pretty)
           mods |= ITALIC;
         }
         goto NEXT_STYLE;
-          
-      case 's':
+
+      case 'S':
         if (strncasecmp(style, "SuperBold", 9) == 0)
         {
           mods |= BOLD;
         }
         goto NEXT_STYLE;
-          
+
       default: // find the next gap
         goto NEXT_STYLE;
       } // switch end
 NEXT_STYLE:
-      while ((*style != ' ') && (*style != '\t'))
+      while ((*style != ' ') && (*style != '\t') && (*style != ','))
       {
         style++;
         if ((style >= last) || (*style == 0)) goto STYLE_DONE;
@@ -211,17 +208,17 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
 {
   FcFontSet  *fnt_set;     // Will hold the list of fonts we find
   FcPattern   *fnt_pattern; // Holds the generic "match all names" pattern
-  FcObjectSet *fnt_obj_set = 0; // Holds the generic "match all objects" 
-  
+  FcObjectSet *fnt_obj_set = 0; // Holds the generic "match all objects"
+
   int j; // loop iterator variable
   int font_count; // Total number of fonts found to process
   char **full_list; // The list of font names we build
 
   if (fl_free_font > FL_FREE_FONT) // already been here
     return (Fl_Font)fl_free_font;
-  
+
   fl_open_display(); // Just in case...
-    
+
   // Make sure fontconfig is ready... is this necessary? The docs say it is
   // safe to call it multiple times, so just go for it anyway!
   if (!FcInit())
@@ -237,12 +234,13 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
   // "pattern_name"?
   fnt_pattern = FcPatternCreate();
   fnt_obj_set = FcObjectSetBuild(FC_FAMILY, FC_STYLE, (void *)0);
-    
+
   // Hopefully, this is a set of all the fonts...
   fnt_set = FcFontList(0, fnt_pattern, fnt_obj_set);
-  
-  // We don't need the fnt_pattern any more, release it
+
+  // We don't need the fnt_pattern and fnt_obj_set any more, release them
   FcPatternDestroy(fnt_pattern);
+  FcObjectSetDestroy(fnt_obj_set);
 
   // Now, if we got any fonts, iterate through them...
   if (fnt_set)
@@ -250,22 +248,22 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
     char *stop;
     char *start;
     char *first;
-    
+
     font_count = fnt_set->nfont; // How many fonts?
-    
+
     // Allocate array of char*'s to hold the name strings
     full_list = (char **)malloc(sizeof(char *) * font_count);
-    
+
     // iterate through all the font patterns and get the names out...
       for (j = 0; j < font_count; j++)
       {
       // NOTE: FcChar8 is a typedef of "unsigned char"...
       FcChar8 *font; // String to hold the font's name
-            
+
       // Convert from fontconfig internal pattern to human readable name
       // NOTE: This WILL malloc storage, so we need to free it later...
       font = FcNameUnparse(fnt_set->fonts[j]);
-            
+
       // The returned strings look like this...
       // Century Schoolbook:style=Bold Italic,fed kursiv,Fett Kursiv,...
       // So the bit we want is up to the first comma - BUT some strings have
@@ -284,10 +282,12 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
         first = (char *)font; // name is just what was returned
       }
       // Truncate the name after the (english) modifiers description
-      if (stop)
-      {
-        *stop = 0; // Terminate the string at the first comma, if there is one
-      }
+      // Matt: Actually, there is no guarantee that the *first* description is the English one.
+      // Matt: So we keep the entire description, just in case.
+      //if (stop)
+      //{
+      //  *stop = 0; // Terminate the string at the first comma, if there is one
+      //}
 
       // Copy the font description into our list
       if (first == (char *)font)
@@ -306,13 +306,13 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
         if (reg) reg[1]='.';
       }
     }
-        
+
     // Release the fnt_set - we don't need it any more
     FcFontSetDestroy(fnt_set);
-        
+
     // Sort the list into alphabetic order
     qsort(full_list, font_count, sizeof(*full_list), name_sort);
-    
+
     // Now let us add the names we got to fltk's font list...
     for (j = 0; j < font_count; j++)
     {
@@ -327,7 +327,7 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
         stored_name = strdup(xft_name);
         Fl::set_font((Fl_Font)(j + FL_FREE_FONT), stored_name);
         fl_free_font ++;
-        
+
         free(full_list[j]); // release that name from our internal array
       }
     }
@@ -380,5 +380,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_xft.cxx 7913 2010-11-29 18:18:27Z greg.ercolano $".
+// End of "$Id$".
 //

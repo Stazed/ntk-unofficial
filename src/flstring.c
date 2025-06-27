@@ -1,24 +1,15 @@
 /*
- * "$Id: flstring.c 7903 2010-11-28 21:06:39Z matt $"
+ * "$Id$"
  *
  * BSD string functions for the Fast Light Tool Kit (FLTK).
  *
  * Copyright 1998-2010 by Bill Spitzak and others.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This library is free software. Distribution and use rights are outlined in
+ * the file "COPYING" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at:
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA.
+ *     http://www.fltk.org/COPYING.php
  *
  * Please report all bugs and problems on the following page:
  *
@@ -99,7 +90,26 @@ fl_strlcpy(char       *dst,	/* O - Destination string */
   return (srclen);
 }
 
+#define C_RANGE(c,l,r) ( (c) >= (l) && (c) <= (r) )
+
+/**
+ * locale independent ascii oriented case cmp
+ * returns 0 if string successfully compare, -1 if s<t, +1 if s>t
+ */
+int fl_ascii_strcasecmp(const char *s, const char *t) {
+  if (!s || !t) return (s==t ? 0 : (!s ? -1 : +1));
+  
+  for(;*s && *t; s++,t++) {
+    if (*s == *t) continue;
+    if (*s < *t) {
+      if ( (*s+0x20)!=*t || !C_RANGE(*s,'A','Z') ) return -1;
+    } else { 	/* (*s > *t) */
+      if ( (*s-0x20)!=*t || !C_RANGE(*s,'a','z') ) return +1;
+    }
+  }
+  return (*s==*t) ? 0 : (*t ? -1 : +1);
+}
 
 /*
- * End of "$Id: flstring.c 7903 2010-11-28 21:06:39Z matt $".
+ * End of "$Id$".
  */

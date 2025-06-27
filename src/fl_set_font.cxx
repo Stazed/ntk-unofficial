@@ -1,24 +1,15 @@
 //
-// "$Id: fl_set_font.cxx 7903 2010-11-28 21:06:39Z matt $"
+// "$Id$"
 //
 // Font utilities for the Fast Light Tool Kit (FLTK).
 //
 // Copyright 1998-2010 by Bill Spitzak and others.
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Library General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
+// This library is free software. Distribution and use rights are outlined in
+// the file "COPYING" which should have been included with this file.  If this
+// file is missing or damaged, see the license at:
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-// USA.
+//     http://www.fltk.org/COPYING.php
 //
 // Please report all bugs and problems on the following page:
 //
@@ -41,6 +32,9 @@ static int table_size;
   the string is not copied, so the string must be in static memory.
 */    
 void Fl::set_font(Fl_Font fnum, const char* name) {
+#ifdef __APPLE__
+  if (!fl_fonts) fl_fonts = Fl_X::calc_fl_fonts();
+#endif
   while (fnum >= table_size) {
     int i = table_size;
     if (!i) {	// don't realloc the built-in table
@@ -79,7 +73,7 @@ void Fl::set_font(Fl_Font fnum, const char* name) {
   s->xlist = 0;
 #endif
   s->first = 0;
-  fl_font(-1, 0);
+  Fl_Display_Device::display_device()->driver()->font(-1, 0);
 }
 /** Copies one face to another. */
 void Fl::set_font(Fl_Font fnum, Fl_Font from) {
@@ -90,8 +84,13 @@ void Fl::set_font(Fl_Font fnum, Fl_Font from) {
     face. Under X this value is passed to XListFonts to get all the sizes
     of this face.
 */
-const char* Fl::get_font(Fl_Font fnum) {return fl_fonts[fnum].name;}
+const char* Fl::get_font(Fl_Font fnum) {
+#ifdef __APPLE__
+  if (!fl_fonts) fl_fonts = Fl_X::calc_fl_fonts();
+#endif
+  return fl_fonts[fnum].name;
+}
 
 //
-// End of "$Id: fl_set_font.cxx 7903 2010-11-28 21:06:39Z matt $".
+// End of "$Id$".
 //
