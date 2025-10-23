@@ -933,8 +933,8 @@ void fl_embed ( Fl_Window *w, Window parent )
     /* mark this window as wanting to be embedded */
     unsigned long buffer[2];
 
-    buffer[0] = 1;                                              /* protocol version */
-    buffer[1] = 0;
+    buffer[0] = 0;                                              /* protocol version */
+    buffer[1] = 1;
 /* XEMBED_MAPPED; */
     
     XChangeProperty (fl_display,
