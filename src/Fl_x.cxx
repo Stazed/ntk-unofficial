@@ -2052,8 +2052,6 @@ int Fl_X::ewmh_supported() {
 /* Change an existing window to fullscreen */
 void Fl_Window::fullscreen_x() {
   if (Fl_X::ewmh_supported()) {
-      
-      printf("GET SET HERE- ewmh_supported???\n");
     int top, bottom, left, right;
 
     top = fullscreen_screen_top;
