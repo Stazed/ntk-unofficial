@@ -40,6 +40,16 @@
 
 #include <config.h>
 
+int Fl_Window::no_fullscreen_x = 0;
+int Fl_Window::no_fullscreen_y = 0;
+int Fl_Window::no_fullscreen_w = 0;
+int Fl_Window::no_fullscreen_h = 0;
+
+int Fl_Window::fullscreen_screen_top = -1;
+int Fl_Window::fullscreen_screen_bottom = -1;
+int Fl_Window::fullscreen_screen_left = -1;
+int Fl_Window::fullscreen_screen_right = -1;
+
 void Fl_Window::border(int b) {
   if (b) {
     if (border()) return;
@@ -60,38 +70,62 @@ void Fl_Window::border(int b) {
 #endif
 }
 
+/* Note: The previous implementation toggled border(). With this new
+   implementation this is not necessary. Additionally, if we do that,
+   the application may lose focus when switching out of fullscreen
+   mode with some window managers. Besides, the API does not say that
+   the FLTK border state should be toggled; it only says that the
+   borders should not be *visible*. 
+*/
 void Fl_Window::fullscreen() {
-#ifndef WIN32
-  //this would clobber the fake wm, since it relies on the border flags to
-  //determine its thickness
-  border(0);
-#endif
-#if defined(__APPLE__) || defined(WIN32) || defined(USE_X11)
-  int sx, sy, sw, sh;
-  Fl::screen_xywh(sx, sy, sw, sh, x(), y(), w(), h());
-  // if we are on the main screen, we will leave the system menu bar unobstructed
-  if (Fl::x()>=sx && Fl::y()>=sy && Fl::x()+Fl::w()<=sx+sw && Fl::y()+Fl::h()<=sy+sh) {
-    sx = Fl::x(); sy = Fl::y(); 
-    sw = Fl::w(); sh = Fl::h();
+  no_fullscreen_x = x();
+  no_fullscreen_y = y();
+  no_fullscreen_w = w();
+  no_fullscreen_h = h();
+  if (shown() && !(flags() & Fl_Widget::FULLSCREEN)) {
+    fullscreen_x();
+    set_flag(FULLSCREEN);   // CHECK!!!
+  } else {
+    set_flag(FULLSCREEN);
   }
-  if (x()==sx) x(sx+1); // make sure that we actually execute the resize
-#if defined(USE_X11)
-  resize(0, 0, w(), h()); // work around some quirks in X11
-#endif
-  resize(sx, sy, sw, sh);
-#else
-  if (!x()) x(1); // make sure that we actually execute the resize
-  resize(0,0,Fl::w(),Fl::h());
-#endif
 }
 
 void Fl_Window::fullscreen_off(int X,int Y,int W,int H) {
-  // this order produces less blinking on IRIX:
-  resize(X,Y,W,H);
-#ifndef WIN32
-  border(1);
-#endif
+  if (shown() && (flags() & Fl_Widget::FULLSCREEN)) {
+    fullscreen_off_x(X, Y, W, H);
+    clear_flag(FULLSCREEN);     // CHECK!!!
+  } else {
+    clear_flag(FULLSCREEN);
+  }
+  no_fullscreen_x = no_fullscreen_y = no_fullscreen_w = no_fullscreen_h = 0;
 }
+
+void Fl_Window::fullscreen_off() {
+  if (!no_fullscreen_x && !no_fullscreen_y) {
+    // Window was initially created fullscreen - default to current monitor
+    no_fullscreen_x = x();
+    no_fullscreen_y = y();
+  }
+  fullscreen_off(no_fullscreen_x, no_fullscreen_y, no_fullscreen_w, no_fullscreen_h);
+}
+
+void Fl_Window::fullscreen_screens(int top, int bottom, int left, int right) {
+  if ((top < 0) || (bottom < 0) || (left < 0) || (right < 0)) {
+    fullscreen_screen_top = -1;
+    fullscreen_screen_bottom = -1;
+    fullscreen_screen_left = -1;
+    fullscreen_screen_right = -1;
+  } else {
+    fullscreen_screen_top = top;
+    fullscreen_screen_bottom = bottom;
+    fullscreen_screen_left = left;
+    fullscreen_screen_right = right;
+  }
+
+  if (shown() && fullscreen_active())
+    fullscreen_x();
+}
+
 
 //
 // End of "$Id: Fl_Window_fullscreen.cxx 8515 2011-03-12 21:36:21Z manolo $".

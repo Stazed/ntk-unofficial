@@ -371,6 +371,10 @@ Atom fl_NET_WM_NAME;			// utf8 aware window label
 Atom fl_NET_WM_ICON_NAME;		// utf8 aware window icon name
 Atom fl_XEMBED;
 Atom fl_XEMBED_INFO;
+static Atom fl_NET_WM_STATE;
+static Atom fl_NET_WM_STATE_FULLSCREEN;
+static Atom fl_NET_SUPPORTING_WM_CHECK;
+static Atom fl_NET_WM_FULLSCREEN_MONITORS;
 
 /*
   X defines 32-bit-entities to have a format value of max. 32,
@@ -670,6 +674,10 @@ void fl_open_display(Display* d) {
   fl_NET_WM_ICON_NAME   = XInternAtom(d, "_NET_WM_ICON_NAME",   0);
   fl_XEMBED             = XInternAtom(d, "_XEMBED",             0);
   fl_XEMBED_INFO        = XInternAtom(d, "_XEMBED_INFO",        0);
+  fl_NET_WM_STATE       = XInternAtom(d, "_NET_WM_STATE",       0);
+  fl_NET_WM_STATE_FULLSCREEN = XInternAtom(d, "_NET_WM_STATE_FULLSCREEN", 0);
+  fl_NET_SUPPORTING_WM_CHECK = XInternAtom(d, "_NET_SUPPORTING_WM_CHECK", 0);
+  fl_NET_WM_FULLSCREEN_MONITORS = XInternAtom(d, "_NET_WM_FULLSCREEN_MONITORS", 0);
 
   if (sizeof(Atom) < 4)
     atom_bits = sizeof(Atom) * 8;
@@ -693,7 +701,7 @@ void fl_open_display(Display* d) {
 #endif
 
   Fl::get_system_colors();
-  
+
   fl_register_themes();
 
   Fl_Theme::load_default();
@@ -713,7 +721,7 @@ static void fl_init_workarea() {
   Atom actual;
   unsigned long count, remaining;
   int format;
-  unsigned *xywh;
+  long *xywh = 0;
 
   if (XGetWindowProperty(fl_display, RootWindow(fl_display, fl_screen),
                          _NET_WORKAREA, 0, 4 * sizeof(unsigned), False,
@@ -825,6 +833,26 @@ void fl_sendClientMessage(Window window, Atom message,
   e.xclient.data.l[4] = (long)d4;
   XSendEvent(fl_display, window, 0, 0, &e);
 }
+
+static int get_xwinprop(Window wnd, Atom prop, long max_length,
+                        unsigned long *nitems, unsigned long **data) {
+  Atom actual;
+  int format;
+  unsigned long bytes_after;
+  
+  if (Success != XGetWindowProperty(fl_display, wnd, prop, 0, max_length, 
+                                    False, AnyPropertyType, &actual, &format, 
+                                    nitems, &bytes_after, (unsigned char**)data)) {
+    return -1;
+  }
+
+  if (actual == None || format != 32) {
+    return -1;
+  }
+
+  return 0;
+}
+
 
 ////////////////////////////////////////////////////////////////
 // Code for copying to clipboard and DnD out of the program:
@@ -949,7 +977,7 @@ void fl_embed ( Fl_Window *w, Window parent )
 
 static void
 xembed_send_configure_event ( Fl_Socket_Window *w )
-{
+  {
     /* printf( "NTK: Sending synthetic configure event to embedded window\n" ); */
 
     XConfigureEvent xc;
@@ -976,7 +1004,7 @@ xembed_send_configure_event ( Fl_Socket_Window *w )
 
 static int
 xembed_get_info ( Window window, unsigned long *version, unsigned long *flags )
-{
+    {
     int r;
 
     Atom type;
@@ -1006,23 +1034,23 @@ xembed_get_info ( Window window, unsigned long *version, unsigned long *flags )
     XFree(data);
 
     return 1;
-}
+  }
 
 static int
 xembed_maybe_embed_window ( Window parent, Window window )
 {
     if ( parent != window )
-    {
+  {
         Fl_Socket_Window *p = (Fl_Socket_Window*)fl_find( parent );
     
         if ( p )
-        {
+    {
             if ( Fl_Socket_Window::is_socket( p ) )
-            {
+      {
                 if ( p->plug_xid() )
                 {
                     // error, already embedded.
-                }
+    }
                 else
                 {
                     /* printf( "NTK: Got embed request... Replying with XEMBED_EMBEDDED_NOTIFY\n" ); */
@@ -1036,8 +1064,8 @@ xembed_maybe_embed_window ( Window parent, Window window )
 
                     xembed_send_configure_event( p );
                     return 1;
-                }
-            }
+  }
+}
         }   
     }
 
@@ -1047,7 +1075,7 @@ xembed_maybe_embed_window ( Window parent, Window window )
 /*
   Internal function to reduce "deprecated" warnings for XKeycodeToKeysym().
   This way we get at most one warning. The option to use XkbKeycodeToKeysym()
-  instead would not help much - see STR #2913 for more information.
+   instead would not help much - see STR #2913 for more information.
 
   Update (July 22, 2022): disable "deprecated declaration" warnings in
   this function for GCC >= 4.6 and clang (all versions) to get rid of
@@ -1259,7 +1287,7 @@ int fl_handle(const XEvent& thisevent)
   
   if ( fl_handle_xembed( xevent ) )
       return 1;
-  
+
   switch (xevent.type) {
 
   case KeymapNotify:
@@ -1289,15 +1317,15 @@ int fl_handle(const XEvent& thisevent)
                              &portion)) break; // quit on error
       if (actual == TARGETS || actual == XA_ATOM) {
 	Atom type = XA_STRING;
-	for (unsigned i = 0; i<count; i++) {
+	  for (unsigned i = 0; i<count; i++) { 
 	  Atom t = ((Atom*)portion)[i];
-	    if (t == fl_Xatextplainutf ||
-		  t == fl_Xatextplain ||
+	  if (t == fl_Xatextplainutf ||
+	      t == fl_Xatextplain ||
 		  t == fl_XaUtf8String) {type = t; break;}
-	    // rest are only used if no utf-8 available:
-	    if (t == fl_XaText ||
-		  t == fl_XaTextUriList ||
-		  t == fl_XaCompoundText) type = t;
+	  // rest are only used if no utf-8 available:
+	  if (t == fl_XaText ||
+	      t == fl_XaTextUriList ||
+	      t == fl_XaCompoundText) type = t;
 	}
 	XFree(portion);
 	Atom property = xevent.xselection.property;
@@ -1306,11 +1334,11 @@ int fl_handle(const XEvent& thisevent)
 	      fl_event_time);
 	return true;
       }
-      // Make sure we got something sane...
+	// Make sure we got something sane...
       if ((portion == NULL) || (format != 8) || (count == 0)) {
 	if (portion) XFree(portion);
         return true;
-	}
+      }
       buffer = (unsigned char*)realloc(buffer, bytesread+count+remaining+1);
       memcpy(buffer+bytesread, portion, count);
       XFree(portion);
@@ -1324,7 +1352,7 @@ int fl_handle(const XEvent& thisevent)
       convert_crlf(buffer, bytesread);
     }
     Fl::e_text = buffer ? (char*)buffer : (char *)"";
-    Fl::e_length = bytesread;
+      Fl::e_length = bytesread;
     int old_event = Fl::e_number;
     fl_selection_requestor->handle(Fl::e_number = FL_PASTE);
     Fl::e_number = old_event;
@@ -1354,32 +1382,32 @@ int fl_handle(const XEvent& thisevent)
     e.target = fl_xevent->xselectionrequest.target;
     e.time = fl_xevent->xselectionrequest.time;
     e.property = fl_xevent->xselectionrequest.property;
-    if (e.target == TARGETS) {
-      Atom a[3] = {fl_XaUtf8String, XA_STRING, fl_XaText};
-      XChangeProperty(fl_display, e.requestor, e.property,
-                      XA_ATOM, atom_bits, 0, (unsigned char*)a, 3);
-    } else if (/*e.target == XA_STRING &&*/ fl_selection_length[clipboard]) {
-    if (e.target == fl_XaUtf8String ||
-	     e.target == XA_STRING ||
-	     e.target == fl_XaCompoundText ||
-	     e.target == fl_XaText ||
-	     e.target == fl_Xatextplain ||
-	     e.target == fl_Xatextplainutf) {
-	// clobber the target type, this seems to make some applications
-	// behave that insist on asking for XA_TEXT instead of UTF8_STRING
-	// Does not change XA_STRING as that breaks xclipboard.
-	if (e.target != XA_STRING) e.target = fl_XaUtf8String;
+      if (e.target == TARGETS) {
+	Atom a[3] = {fl_XaUtf8String, XA_STRING, fl_XaText};
 	XChangeProperty(fl_display, e.requestor, e.property,
-			 e.target, 8, 0,
-			 (unsigned char *)fl_selection_buffer[clipboard],
-			 fl_selection_length[clipboard]);
-      }
-    } else {
-//    char* x = XGetAtomName(fl_display,e.target);
-//    fprintf(stderr,"selection request of %s\n",x);
-//    XFree(x);
-      e.property = 0;
-    }
+	                XA_ATOM, atom_bits, 0, (unsigned char*)a, 3);
+    } else if (/*e.target == XA_STRING &&*/ fl_selection_length[clipboard]) {
+	  if (e.target == fl_XaUtf8String ||
+	      e.target == XA_STRING ||
+	      e.target == fl_XaCompoundText ||
+	      e.target == fl_XaText ||
+	      e.target == fl_Xatextplain ||
+	     e.target == fl_Xatextplainutf) {
+	    // clobber the target type, this seems to make some applications
+	    // behave that insist on asking for XA_TEXT instead of UTF8_STRING
+	    // Does not change XA_STRING as that breaks xclipboard.
+	    if (e.target != XA_STRING) e.target = fl_XaUtf8String;
+	    XChangeProperty(fl_display, e.requestor, e.property,
+		            e.target, 8, 0,
+		            (unsigned char *)fl_selection_buffer[clipboard],
+		            fl_selection_length[clipboard]);
+	  }
+	} else {
+	  //    char* x = XGetAtomName(fl_display,e.target);
+	  //    fprintf(stderr,"selection request of %s\n",x);
+	  //    XFree(x);
+	  e.property = 0;
+	}
     XSendEvent(fl_display, e.requestor, 0, 0, (XEvent *)&e);}
     return 1;
 
@@ -1465,7 +1493,7 @@ int fl_handle(const XEvent& thisevent)
         if (!strncmp(XGetAtomName(fl_display, fl_dnd_source_types[i]),
                      "text/", 5))
           break;
-      }
+	}
 
       if (fl_dnd_source_types[i])
         fl_dnd_type = fl_dnd_source_types[i];
@@ -1769,7 +1797,7 @@ int fl_handle(const XEvent& thisevent)
     set_event_xy();
     Fl::e_is_click = 0;
     break;}
-
+  
   case ButtonPress:
     Fl::e_keysym = FL_Button + xevent.xbutton.button;
     set_event_xy();
@@ -1783,12 +1811,12 @@ int fl_handle(const XEvent& thisevent)
       event = FL_MOUSEWHEEL;
     } else if (xevent.xbutton.button == 6) {
       Fl::e_dy = 0;
-      Fl::e_dx = -1; // Left
-      event = FL_MOUSEWHEEL;
+	Fl::e_dx = -1; // Left
+	event = FL_MOUSEWHEEL;
     } else if (xevent.xbutton.button == 7) {
       Fl::e_dy = 0;
-      Fl::e_dx = +1; // Right
-      event = FL_MOUSEWHEEL;      
+	Fl::e_dx = +1; // Right
+	event = FL_MOUSEWHEEL;
     } else {
       Fl::e_state |= (FL_BUTTON1 << (xevent.xbutton.button-1));
       event = FL_PUSH;
@@ -1799,6 +1827,32 @@ int fl_handle(const XEvent& thisevent)
     in_a_window = true;
     break;
 
+  case PropertyNotify:
+    if (xevent.xproperty.atom == fl_NET_WM_STATE) {
+      int fullscreen_state = 0;
+      if (xevent.xproperty.state != PropertyDelete) {
+        unsigned long nitems;
+        unsigned long *words = 0;
+        if (0 == get_xwinprop(xid, fl_NET_WM_STATE, 64, &nitems, &words) ) { 
+          for (unsigned long item = 0; item < nitems; item++) {
+            if (words[item] == fl_NET_WM_STATE_FULLSCREEN) {
+              fullscreen_state = 1;
+            }
+          }
+        }
+	if ( words ) { XFree(words); words = 0; }
+      }
+      if (window->fullscreen_active() && !fullscreen_state) {
+        window->_clear_fullscreen();
+        event = FL_FULLSCREEN;
+      }
+      if (!window->fullscreen_active() && fullscreen_state) {
+        window->_set_fullscreen();
+        event = FL_FULLSCREEN;
+      }
+    }
+    break;
+    
   case MotionNotify:
     set_event_xy();
 #  if CONSOLIDATE_MOTION
@@ -1944,6 +1998,106 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
 
 ////////////////////////////////////////////////////////////////
 
+#define _NET_WM_STATE_REMOVE        0  /* remove/unset property */
+#define _NET_WM_STATE_ADD           1  /* add/set property */
+#define _NET_WM_STATE_TOGGLE        2  /* toggle property  */
+
+static void send_wm_event(Window wnd, Atom message,
+                          unsigned long d0, unsigned long d1=0,
+                          unsigned long d2=0, unsigned long d3=0,
+                          unsigned long d4=0) {
+  XEvent e;
+  e.xany.type = ClientMessage;
+  e.xany.window = wnd;
+  e.xclient.message_type = message;
+  e.xclient.format = 32;
+  e.xclient.data.l[0] = d0;
+  e.xclient.data.l[1] = d1;
+  e.xclient.data.l[2] = d2;
+  e.xclient.data.l[3] = d3;
+  e.xclient.data.l[4] = d4;
+  XSendEvent(fl_display, RootWindow(fl_display, fl_screen),
+             0, SubstructureNotifyMask | SubstructureRedirectMask,
+             &e);
+}
+
+static void send_wm_state_event(Window wnd, int add, Atom prop) {
+  send_wm_event(wnd, fl_NET_WM_STATE,
+                add ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE, prop);
+}
+
+int Fl_X::ewmh_supported() {
+  static int result = -1;
+
+  if (result == -1) {
+    fl_open_display();
+    result = 0;
+    unsigned long nitems;
+    unsigned long *words = 0;
+    if (0 == get_xwinprop(XRootWindow(fl_display, fl_screen), fl_NET_SUPPORTING_WM_CHECK, 64,
+                          &nitems, &words) && nitems == 1) {
+      Window child = words[0];
+      if ( words ) { XFree(words); words = 0; }
+      if (0 == get_xwinprop(child, fl_NET_SUPPORTING_WM_CHECK, 64,
+                           &nitems, &words) ) {
+        if ( nitems == 1) result = (child == words[0]);
+      }
+    }
+    if ( words ) { XFree(words); words = 0; }
+  }
+
+  return result;
+}
+
+/* Change an existing window to fullscreen */
+void Fl_Window::fullscreen_x() {
+  if (Fl_X::ewmh_supported()) {
+      
+      printf("GET SET HERE- ewmh_supported???\n");
+    int top, bottom, left, right;
+
+    top = fullscreen_screen_top;
+    bottom = fullscreen_screen_bottom;
+    left = fullscreen_screen_left;
+    right = fullscreen_screen_right;
+
+    if ((top < 0) || (bottom < 0) || (left < 0) || (right < 0)) {
+      top = Fl::screen_num(x(), y(), w(), h());
+      bottom = top;
+      left = top;
+      right = top;
+    }
+
+    send_wm_event(fl_xid(this), fl_NET_WM_FULLSCREEN_MONITORS,
+                  top, bottom, left, right);
+    send_wm_state_event(fl_xid(this), 1, fl_NET_WM_STATE_FULLSCREEN);
+  } else 
+  {
+    _set_fullscreen();
+    hide();
+    show();
+    /* We want to grab the window, not a widget, so we cannot use Fl::grab */
+    XGrabKeyboard(fl_display, fl_xid(this), 1, GrabModeAsync, GrabModeAsync, fl_event_time);
+    Fl::handle(FL_FULLSCREEN, this);
+  }
+}
+
+void Fl_Window::fullscreen_off_x(int X, int Y, int W, int H) {
+  if (Fl_X::ewmh_supported()) {
+    send_wm_state_event(fl_xid(this), 0, fl_NET_WM_STATE_FULLSCREEN);
+  } else
+  {
+    _clear_fullscreen();
+    /* The grab will be lost when the window is destroyed */
+    hide();
+    resize(X,Y,W,H);
+    show();
+    Fl::handle(FL_FULLSCREEN, this);
+  }
+}
+
+////////////////////////////////////////////////////////////////
+
 // A subclass of Fl_Window may call this to associate an X window it
 // creates with the Fl_Window:
 
@@ -1984,7 +2138,7 @@ ExposureMask|StructureNotifyMask
 |KeyPressMask|KeyReleaseMask|KeymapStateMask|FocusChangeMask
 |ButtonPressMask|ButtonReleaseMask
 |EnterWindowMask|LeaveWindowMask
-    |PointerMotionMask;
+|PointerMotionMask;
 
 static const int XEmbedEventMask = XEventMask |
                                 SubstructureRedirectMask |
@@ -2042,6 +2196,23 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
     return;
   }
 
+  // Compute which screen(s) we should be on if we want to go fullscreen
+  int fullscreen_top, fullscreen_bottom, fullscreen_left, fullscreen_right;
+
+  fullscreen_top = win->fullscreen_screen_top;
+  fullscreen_bottom = win->fullscreen_screen_bottom;
+  fullscreen_left = win->fullscreen_screen_left;
+  fullscreen_right = win->fullscreen_screen_right;
+
+  if ((fullscreen_top < 0) || (fullscreen_bottom < 0) ||
+      (fullscreen_left < 0) || (fullscreen_right < 0)) {
+    fullscreen_top = Fl::screen_num(X, Y, W, H);
+    fullscreen_bottom = fullscreen_top;
+    fullscreen_left = fullscreen_top;
+    fullscreen_right = fullscreen_top;
+  }
+
+
   ulong root = win->parent() ?
     fl_xid(win->window()) : RootWindow(fl_display, fl_screen);
 
@@ -2067,6 +2238,25 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
     attr.save_under = 1; mask |= CWSaveUnder;
     if (!win->border()) {attr.override_redirect = 1; mask |= CWOverrideRedirect;}
   }
+
+  // For the non-EWMH fullscreen case, we cannot use the code above,
+  // since we do not want save_under, do not want to turn off the
+  // border, and cannot grab without an existing window. Besides, 
+  // there is no clear_override(). 
+  if (win->fullscreen_active() && !Fl_X::ewmh_supported()) {
+    int sx, sy, sw, sh;
+    attr.override_redirect = 1;
+    mask |= CWOverrideRedirect;
+    Fl::screen_xywh(sx, sy, sw, sh, fullscreen_left);
+    X = sx;
+    Fl::screen_xywh(sx, sy, sw, sh, fullscreen_right);
+    W = sx + sw - X;
+    Fl::screen_xywh(sx, sy, sw, sh, fullscreen_top);
+    Y = sy;
+    Fl::screen_xywh(sx, sy, sw, sh, fullscreen_bottom);
+    H = sy + sh - Y;
+  }
+  
   if (fl_background_pixel >= 0) {
     attr.background_pixel = fl_background_pixel;
     fl_background_pixel = -1;
@@ -2098,17 +2288,17 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
     // set the class property, which controls the icon used:
     if (win->xclass()) {
       char buffer[1024];
-      char *p; const char *q;
-      // replace punctuation with underscores, because it breaks XResource lookup
-      for (p = buffer, q = win->xclass(); *q || (*q&128); q++)
-          *p++ = isalnum(*q) || *q == '-' || *q == ' ' ? *q : '_';
-      *p++ = 0;
+      const char *xclass = win->xclass();
+      const int len = strlen(xclass);
+      // duplicate the xclass string for use as XA_WM_CLASS
+      strcpy(buffer, xclass);
+      strcpy(buffer + len + 1, xclass);
       // create the capitalized version:
-      q = buffer;
-      *p = toupper(*q++); if (*p++ == 'X') *p++ = toupper(*q++);
-      while ((*p++ = *q++));
+      buffer[len + 1] = toupper(buffer[len + 1]);
+      if (buffer[len + 1] == 'X')
+        buffer[len + 2] = toupper(buffer[len + 2]);
       XChangeProperty(fl_display, xp->xid, XA_WM_CLASS, XA_STRING, 8, 0,
-                      (unsigned char *)buffer, p-buffer-1);
+                      (unsigned char *)buffer, len * 2 + 2);
     }
 
     if (win->non_modal() && xp->next && !fl_disable_transient_for) {
@@ -2117,6 +2307,12 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
       while (wp->parent()) wp = wp->window();
       XSetTransientForHint(fl_display, xp->xid, fl_xid(wp));
       if (!wp->visible()) showit = 0; // guess that wm will not show it
+      if (win->modal()) {
+        Atom net_wm_state = XInternAtom (fl_display, "_NET_WM_STATE", 0);
+        Atom net_wm_state_skip_taskbar = XInternAtom (fl_display, "_NET_WM_STATE_MODAL", 0);
+        XChangeProperty (fl_display, xp->xid, net_wm_state, XA_ATOM, 32,
+            PropModeAppend, (unsigned char*) &net_wm_state_skip_taskbar, 1);
+      }
     }
 
     // Make sure that borderless windows do not show in the task bar
@@ -2125,6 +2321,19 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
       Atom net_wm_state_skip_taskbar = XInternAtom (fl_display, "_NET_WM_STATE_SKIP_TASKBAR", 0);
       XChangeProperty (fl_display, xp->xid, net_wm_state, XA_ATOM, 32,
           PropModeAppend, (unsigned char*) &net_wm_state_skip_taskbar, 1);
+    }
+
+    // If asked for, create fullscreen
+    if (win->fullscreen_active() && Fl_X::ewmh_supported()) {
+      unsigned long data[4];
+      data[0] = fullscreen_top;
+      data[1] = fullscreen_bottom;
+      data[2] = fullscreen_left;
+      data[3] = fullscreen_right;
+      XChangeProperty (fl_display, xp->xid, fl_NET_WM_FULLSCREEN_MONITORS, XA_ATOM, 32,
+                       PropModeReplace, (unsigned char*) data, 4);
+      XChangeProperty (fl_display, xp->xid, fl_NET_WM_STATE, XA_ATOM, 32,
+                       PropModeAppend, (unsigned char*) &fl_NET_WM_STATE_FULLSCREEN, 1);
     }
 
     // Make it receptive to DnD:
@@ -2163,6 +2372,11 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
     win->handle(Fl::e_number = FL_SHOW); // get child windows to appear
     Fl::e_number = old_event;
     // win->redraw();
+  }
+
+  // non-EWMH fullscreen case, need grab
+  if (win->fullscreen_active() && !Fl_X::ewmh_supported()) {
+    XGrabKeyboard(fl_display, xp->xid, 1, GrabModeAsync, GrabModeAsync, fl_event_time);
   }
 }
 
@@ -2225,7 +2439,7 @@ void Fl_X::sendxjunk() {
     prop[1] = 1|2|16; // MWM_FUNC_ALL | MWM_FUNC_RESIZE | MWM_FUNC_MAXIMIZE
   }
 
-  if (w->flags() & Fl_Widget::FORCE_POSITION) {
+  if (w->force_position()) {
     hints->flags |= USPosition;
     hints->x = w->x();
     hints->y = w->y();
@@ -2297,7 +2511,7 @@ void Fl_Window::show() {
       align(FL_ALIGN_IMAGE_BACKDROP);
   }
 
-  labeltype(FL_NO_LABEL);
+    labeltype(FL_NO_LABEL);
  
   Fl_Tooltip::exit(this);
   if (!shown()) {

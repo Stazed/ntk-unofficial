@@ -182,6 +182,7 @@ protected:
         NO_OVERLAY      = 1<<15,  ///< window not using a hardware overlay plane (Fl_Menu_Window)
         GROUP_RELATIVE  = 1<<16,  ///< position this widget relative to the parent group, not to the window
         COPIED_TOOLTIP  = 1<<17,  ///< the widget tooltip is internally copied, its destruction is handled by the widget
+        FULLSCREEN      = 1<<18,  ///< a fullscreen window (Fl_Window)
         // (space for more flags)
         USERFLAG3       = 1<<29,  ///< reserved for 3rd party extensions
         USERFLAG2       = 1<<30,  ///< reserved for 3rd party extensions
@@ -583,7 +584,7 @@ public:
       \param[in] cb new callback
       \param[in] p user data
    */
-  void callback(Fl_Callback1*cb, long p=0) {callback_=(Fl_Callback*)cb; user_data_=(void*)p;}
+  void callback(Fl_Callback1*cb, long p=0) {callback_=(Fl_Callback*)cb; user_data_=(void*)(fl_intptr_t)p;}
 
   /** Gets the user data for this widget.
       Gets the current user data (void *) argument that is passed to the callback function.
@@ -826,8 +827,8 @@ public:
       Sets the default callback, which puts a pointer to the widget on the queue 
       returned by Fl::readqueue(). You may want to call this from your own callback.
       \param[in] cb the new callback
-      \param[in] d user data associated with that callback
-      \see callback(), do_callback(), Fl::readqueue()
+    \param[in] d user data associated with that callback
+    \see callback(), do_callback(), Fl::readqueue()
    */
   static void default_callback(Fl_Widget *cb, void *d);
 
@@ -855,6 +856,9 @@ public:
   static unsigned int label_shortcut(const char *t);
   /* Internal use only. */
   static int test_shortcut(const char*, const bool require_alt = false);
+  /* Internal use only. */
+  void _set_fullscreen() {flags_ |= FULLSCREEN;}
+  void _clear_fullscreen() {flags_ &= ~FULLSCREEN;}
 
   /** Checks if w is a child of this widget.
       \param[in] w potential child widget

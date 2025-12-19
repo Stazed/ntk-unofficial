@@ -57,6 +57,14 @@ class Fl_X;
 */
 class FL_EXPORT Fl_Window : public Fl_Group {
 
+  static int no_fullscreen_x;
+  static int no_fullscreen_y;
+  static int no_fullscreen_w;
+  static int no_fullscreen_h;
+  static int fullscreen_screen_top;
+  static int fullscreen_screen_bottom;
+  static int fullscreen_screen_left;
+  static int fullscreen_screen_right;
   static char *default_xclass_;
 
   friend class Fl;
@@ -75,6 +83,8 @@ class FL_EXPORT Fl_Window : public Fl_Group {
   Fl_Color cursor_fg, cursor_bg;
   void size_range_();
   void _Fl_Window(); // constructor innards
+  void fullscreen_x(); // platform-specific part of sending a window to full screen
+  void fullscreen_off_x(int X, int Y, int W, int H);// platform-specific part of leaving full screen
 
   // unimplemented copy ctor and assignment operator
   Fl_Window(const Fl_Window&);
@@ -174,7 +184,7 @@ public:
     dimensions. It is up to the application developer to verify window 
     parameters after the resize request.
   */
-  virtual void resize(int,int,int,int);
+  virtual void resize(int X,int Y,int W,int H);
   /**
     Sets whether or not the window manager border is around the
     window.  The default value is true. void border(int) can be
@@ -232,7 +242,7 @@ public:
 
   /**  Returns true if this window is a menu window. */
   unsigned int menu_window() const {return flags() & MENU_WINDOW;}
-
+  
   /**
     Marks the window as a tooltip window.
 
@@ -280,17 +290,17 @@ public:
     Sets the allowable range the user can resize this window to.
     This only works for top-level windows.
     <UL>
-    <LI>minw and minh are the smallest the window can be.
+    <LI>\p minw and \p minh are the smallest the window can be.
 	Either value must be greater than 0.</LI>
-    <LI>maxw and maxh are the largest the window can be. If either is
+    <LI>\p maxw and \p maxh are the largest the window can be. If either is
 	<I>equal</I> to the minimum then you cannot resize in that direction.
 	If either is zero  then FLTK picks a maximum size in that direction
 	such that the window will fill the screen.</LI>
-    <LI>dw and dh are size increments.  The  window will be constrained
+    <LI>\p dw and \p dh are size increments.  The  window will be constrained
 	to widths of minw + N * dw,  where N is any non-negative integer.
 	If these are less or equal to 1 they are ignored (this is ignored
 	on WIN32).</LI>
-    <LI>aspect is a flag that indicates that the window should preserve its
+    <LI>\p aspect is a flag that indicates that the window should preserve its
 	aspect ratio.  This only works if both the maximum and minimum have
 	the same aspect ratio (ignored on WIN32 and by many X window managers).
 	</LI>
@@ -312,8 +322,16 @@ public:
     It is undefined what happens if the current size does not fit in the
     constraints passed to size_range().
   */
-  void size_range(int a, int b, int c=0, int d=0, int e=0, int f=0, int g=0) {
-    minw=a; minh=b; maxw=c; maxh=d; dw=e; dh=f; aspect=g; size_range_();}
+  void size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0) {
+    this->minw   = minw;
+    this->minh   = minh;
+    this->maxw   = maxw;
+    this->maxh   = maxh;
+    this->dw     = dw;
+    this->dh     = dh;
+    this->aspect = aspect;
+    size_range_();
+  }
 
   /** See void Fl_Window::label(const char*)   */
   const char* label() const	{return Fl_Widget::label();}
@@ -348,11 +366,11 @@ public:
     top.  This is really convenient because your program can call show()
     at any time, even if the window is already up.  It also means that
     show() serves the purpose of raise() in other toolkits.
-    
+
     Fl_Window::show(int argc, char **argv) is used for top-level
     windows and allows standard arguments to be parsed from the
     command-line.
-    
+
     \see Fl_Window::show(int argc, char **argv)
   */
   virtual void show();
@@ -383,16 +401,41 @@ public:
   */
   void show(int argc, char **argv);
   /**
-    Makes the window completely fill the screen, without any window
-    manager border visible.  You must use fullscreen_off() to undo
-    this. This may not work with all window managers.
+    Makes the window completely fill one or more screens, without any
+    window manager border visible.  You must use fullscreen_off() to
+    undo this. 
+
+    \note On some platforms, this can result in the keyboard being
+    grabbed. The window may also be recreated, meaning hide() and
+    show() will be called.
+
+    \see void Fl_Window::fullscreen_screens()
   */
   void fullscreen();
+  /**
+    Turns off any side effects of fullscreen()
+  */
+  void fullscreen_off();
   /**
     Turns off any side effects of fullscreen() and does 
     resize(x,y,w,h).
   */
-  void fullscreen_off(int,int,int,int);
+  void fullscreen_off(int X,int Y,int W,int H);
+  /**
+    Returns non zero if FULLSCREEN flag is set, 0 otherwise. 
+  */
+  unsigned int fullscreen_active() const { return flags() & FULLSCREEN; }
+  /**
+    Sets which screens should be used when this window is in fullscreen
+    mode. The window will be resized to the top of the screen with index
+    \p top, the bottom of the screen with index \p bottom, etc. 
+
+    If this method is never called, or if any argument is < 0, then the
+    window will be resized to fill the screen it is currently on.
+
+    \see void Fl_Window::fullscreen()
+    */
+  void fullscreen_screens(int top, int bottom, int left, int right);
   /**
     Iconifies the window.  If you call this when shown() is false
     it will show() it as an icon.  If the window is already

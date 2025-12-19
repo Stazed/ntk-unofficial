@@ -310,7 +310,11 @@ enum Fl_Event {	// events
       If the widget returns 1, it will receive the data in the immediately 
       following FL_PASTE event.
    */
-  FL_DND_RELEASE	= 23
+  FL_DND_RELEASE	= 23,
+
+  /** The fullscreen state of the window has changed
+   */
+  FL_FULLSCREEN         = 24
 };
 
 /** \name When Conditions */
@@ -598,9 +602,9 @@ inline Fl_Boxtype fl_frame(Fl_Boxtype b) {
 
 /**
    The labeltype() method sets the type of the label.
-   
+
    The following standard label types are included:
-   
+
    \todo	The doxygen comments are incomplete, and some labeltypes
    		are starting with an underscore. Also, there are three
 		external functions undocumented (yet):
@@ -847,19 +851,19 @@ inline Fl_Color fl_rgb_color(uchar g) {
   else return (Fl_Color)(((((g << 8) | g) << 8) | g) << 8);
 }
 
-/** Returns a gray color value from black (i == 0) to white (i == FL_NUM_GRAY - 1). 
-    FL_NUM_GRAY is defined to be 24 in the current FLTK release. 
+/** Returns a gray color value from black (i == 0) to white (i == FL_NUM_GRAY - 1).
+    FL_NUM_GRAY is defined to be 24 in the current FLTK release.
     To get the closest FLTK gray value to an 8-bit grayscale color 'I' use:
 
- \code 
+ \code
    fl_gray_ramp(I * (FL_NUM_GRAY - 1) / 255)
  \endcode
-*/ 
+*/
 inline Fl_Color fl_gray_ramp(int i) {return (Fl_Color)(i+FL_GRAY_RAMP);}
 
 /** Returns a color out of the color cube.
 
-  \p r must be in the range 0 to FL_NUM_RED (5) minus 1, 
+  \p r must be in the range 0 to FL_NUM_RED (5) minus 1,
   \p g must be in the range 0 to FL_NUM_GREEN (8) minus 1,
   \p b must be in the range 0 to FL_NUM_BLUE (5) minus 1.
 
@@ -874,7 +878,7 @@ inline Fl_Color fl_gray_ramp(int i) {return (Fl_Color)(i+FL_GRAY_RAMP);}
 inline Fl_Color fl_color_cube(int r, int g, int b) {
   return (Fl_Color)((b*FL_NUM_RED + r) * FL_NUM_GREEN + g + FL_COLOR_CUBE);}
 
-/*@}*/		// group: Colors  
+/*@}*/		// group: Colors
 
 /** \name Cursors */
 /*@{*/

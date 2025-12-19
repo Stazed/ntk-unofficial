@@ -310,7 +310,46 @@ void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int mx, int my, int mw, int
   screen_xywh(X, Y, W, H, best_screen);
 }
   
+/**
+  Gets the screen number of a screen
+  that contains the specified screen position \p x, \p y
+  \param[in] x, y the absolute screen position
+*/
+int Fl::screen_num(int x, int y) {
+  int screen = 0;
+  if (num_screens < 0) screen_init();
+  
+  for (int i = 0; i < num_screens; i ++) {
+    int sx = 0, sy = 0, sw = 0, sh = 0;
+    Fl::screen_xywh(sx, sy, sw, sh, i);
+    if ((x >= sx) && (x < (sx+sw)) && (y >= sy) && (y < (sy+sh))) {
+      screen = i;
+      break;
+    }
+  }
+  return screen;
+}
 
+/**
+  Gets the screen number for the screen
+  which intersects the most with the rectangle
+  defined by \p x, \p y, \p w, \p h.
+  \param[in] x, y, w, h the rectangle to search for intersection with
+  */
+int Fl::screen_num(int x, int y, int w, int h) {
+  int best_screen = 0;
+  float best_intersection = 0.;
+  for (int i = 0; i < Fl::screen_count(); i++) {
+    int sx = 0, sy = 0, sw = 0, sh = 0;
+    Fl::screen_xywh(sx, sy, sw, sh, i);
+    float sintersection = fl_intersection(x, y, w, h, sx, sy, sw, sh);
+    if (sintersection > best_intersection) {
+      best_screen = i;
+      best_intersection = sintersection;
+    }
+  }
+  return best_screen;
+}
 
 /**
  Gets the screen resolution in dots-per-inch for the given screen. 
