@@ -111,7 +111,6 @@ def configure(conf):
                execute = False,
                define_name='HAVE_PTHREAD_MUTEX_RECURSIVE', mandatory=False,
                msg='Checking for PTHREAD_MUTEX_RECURSIVE')
-#    conf.check(function_name='jpeg_CreateCompress', header_name='jpeglib.h', use='jpeg', define_name='HAVE_LIBJPEG', mandatory=False)
 
     conf.check(
         lib='jpeg',
