@@ -113,6 +113,24 @@ def configure(conf):
                msg='Checking for PTHREAD_MUTEX_RECURSIVE')
 #    conf.check(function_name='jpeg_CreateCompress', header_name='jpeglib.h', use='jpeg', define_name='HAVE_LIBJPEG', mandatory=False)
 
+    conf.check(
+        lib='jpeg',
+        uselib_store='JPEG',
+        define_name='HAVE_LIBJPEG',
+        mandatory=False,
+        fragment='''
+            #include <stdio.h>
+            #include <jpeglib.h>
+
+            int main(void)
+            {
+                struct jpeg_compress_struct cinfo;
+                jpeg_CreateCompress(&cinfo, JPEG_LIB_VERSION, sizeof(cinfo));
+                return 0;
+            }
+        '''
+    )
+
     if Options.options.ENABLE_TEST:
         conf.env.ENABLE_TEST = True
 
