@@ -1,0 +1,37 @@
+#pragma once
+
+#include <stdint.h>
+
+typedef uint16_t U16;
+typedef uint32_t U32;
+typedef uint64_t U64;
+
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_PTHREAD_H
+#cmakedefine HAVE_DIRENT_H
+#cmakedefine HAVE_STRINGS_H
+#cmakedefine HAVE_LOCALE_H
+#cmakedefine HAVE_SYS_SELECT_H
+#cmakedefine HAVE_DLFCN_H
+#cmakedefine HAVE_PNG_H
+
+#cmakedefine HAVE_STRTOLL
+#cmakedefine HAVE_SCANDIR
+#cmakedefine HAVE_STRCASECMP
+#cmakedefine HAVE_SNPRINTF
+#cmakedefine HAVE_VSNPRINTF
+
+#define VERSION "@PROJECT_VERSION@"
+
+#define SIZEOF_SHORT @SIZEOF_SHORT@
+#define SIZEOF_INT @SIZEOF_INT@
+#define SIZEOF_LONG @SIZEOF_LONG@
+
+#define WORDS_BIGENDIAN @WORDS_BIGENDIAN@
+
+#define USE_X11 1
+#define USE_XFT 1
+#define USE_POLL 1
+#define BORDER_WIDTH 1
+#define HAVE_SCANDIR_POSIX 1
+#define HAVE_DLSYM 1
