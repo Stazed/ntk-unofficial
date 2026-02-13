@@ -16,6 +16,9 @@ option(ENABLE_TEST "Build test programs" OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+set(DOCDIR "${CMAKE_INSTALL_FULL_DATADIR}/doc/${PROJECT_NAME}")
+set(FLTK_DOCDIR "\"${DOCDIR}\"")
+
 # --------------------------------------------------
 # Compiler flags
 # --------------------------------------------------
@@ -114,6 +117,7 @@ include_directories(
 )
 
 add_subdirectory(src)
+add_subdirectory(fluid)
 
 # --------------------------------------------------
 # Install headers
@@ -131,4 +135,15 @@ install(DIRECTORY FL/
 configure_file(ntk.pc.in ntk.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/ntk.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
+install(TARGETS
+    ntk ntk_static
+    ntk_images ntk_images_static
+    ntk-chtheme
+    ntk-fluid
+    EXPORT ntkTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

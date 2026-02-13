@@ -263,12 +263,3 @@ endif()
 add_executable(ntk-chtheme ntk-chtheme.cxx)
 target_link_libraries(ntk-chtheme ntk ntk_images)
 
-install(TARGETS
-    ntk ntk_static
-    ntk_images ntk_images_static
-    ntk-chtheme
-    EXPORT ntkTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)

@@ -17,7 +17,7 @@ typedef uint64_t U64;
 
 #cmakedefine HAVE_STRTOLL
 #cmakedefine HAVE_SCANDIR
-#cmakedefine HAVE_STRCASECMP
+#cmakedefine01 HAVE_STRCASECMP
 #cmakedefine HAVE_SNPRINTF
 #cmakedefine HAVE_VSNPRINTF
 
@@ -35,3 +35,5 @@ typedef uint64_t U64;
 #define BORDER_WIDTH 1
 #define HAVE_SCANDIR_POSIX 1
 #define HAVE_DLSYM 1
+#define FLTK_DOCDIR @FLTK_DOCDIR@
+
