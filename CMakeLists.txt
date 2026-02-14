@@ -118,6 +118,9 @@ include_directories(
 
 add_subdirectory(src)
 add_subdirectory(fluid)
+if (ENABLE_TEST)
+    add_subdirectory(test)
+endif()
 
 # --------------------------------------------------
 # Install headers

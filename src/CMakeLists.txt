@@ -30,6 +30,7 @@ Fl_File_Icon.cxx
 Fl_File_Input.cxx
 Fl_Group.cxx
 Fl_Help_View.cxx
+Fl_Help_Dialog.cxx
 Fl_Image.cxx
 Fl_Input.cxx
 Fl_Input_.cxx
@@ -202,6 +203,7 @@ set(NTK_IMAGE_SOURCES
     Fl_JPEG_Image.cxx
     Fl_PNG_Image.cxx
     Fl_PNM_Image.cxx
+    filename_ext.cxx
 )
 
 add_library(ntk_images SHARED ${NTK_IMAGE_SOURCES})
@@ -254,6 +256,15 @@ if(ENABLE_GL)
         Threads::Threads
     )
 
+    add_library(ntk_gl_static STATIC ${NTK_GL_SOURCES})
+
+    target_link_libraries(ntk_gl_static
+        ${GL_LIBRARIES}
+        ${X11_LIBRARIES}
+        ${DL_LIBRARY}
+        ${M_LIBRARY}
+        Threads::Threads
+    )
 endif()
 
 # --------------------------------------------------
