@@ -209,6 +209,19 @@ set(NTK_IMAGE_SOURCES
 add_library(ntk_images SHARED ${NTK_IMAGE_SOURCES})
 add_library(ntk_images_static STATIC ${NTK_IMAGE_SOURCES})
 
+set_target_properties(ntk_images PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+)
+
+set_target_properties(ntk_static PROPERTIES
+    OUTPUT_NAME ntk
+)
+
+set_target_properties(ntk_images_static PROPERTIES
+    OUTPUT_NAME ntk_images
+)
+
 target_link_libraries(ntk_images
     ${JPEG_LIBRARY}
     ${LIBPNG_LIBRARIES}
