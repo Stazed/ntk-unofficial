@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: ntk_images
+Description: Non ToolKit OpenGL support
+Version: @PROJECT_VERSION@
+
+Requires: gl
+Requires.private: x11 xft
+Libs: -L${libdir} -lntk -lgl -lglu -lntk_gl
+Cflags: -I${includedir}/ntk @CFLAGS@

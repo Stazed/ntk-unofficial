@@ -135,10 +135,34 @@ install(DIRECTORY FL/
 # Pkg-config files
 # --------------------------------------------------
 
-configure_file(ntk.pc.in ntk.pc @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/ntk.pc.in ntk.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/ntk.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/ntk_images.pc.in
+    ${CMAKE_BINARY_DIR}/ntk_images.pc
+    @ONLY
+)
+
+install(FILES
+    ${CMAKE_BINARY_DIR}/ntk_images.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
+if(ENABLE_GL)
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/cmake/ntk_gl.pc.in
+        ${CMAKE_BINARY_DIR}/ntk_gl.pc
+        @ONLY
+    )
+
+    install(FILES
+        ${CMAKE_BINARY_DIR}/ntk_gl.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
+endif()
 
 install(TARGETS
     ntk ntk_static
@@ -157,7 +181,7 @@ install(TARGETS
 
 if(NOT TARGET uninstall)
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
         IMMEDIATE @ONLY)
 
