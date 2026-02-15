@@ -11,10 +11,13 @@ function(ntk_example target)
     target_link_libraries(${target}
         ntk_static
         ntk_images_static
-        PkgConfig::X11
-        PkgConfig::FONTCONFIG
+        ${X11_LIBRARIES}
+        ${FONTCONFIG_LIBRARIES}
+        ${CAIRO_LIBRARIES}
+#        PkgConfig::X11
+#        PkgConfig::FONTCONFIG
         PkgConfig::XFT
-        PkgConfig::CAIRO
+#        PkgConfig::CAIRO
     )
 endfunction()
 
