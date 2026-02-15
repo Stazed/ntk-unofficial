@@ -2,38 +2,64 @@
 
 #include <stdint.h>
 
-typedef uint16_t U16;
-typedef uint32_t U32;
-typedef uint64_t U64;
+/* Types (mirror Waf behavior) */
+#cmakedefine U16 @U16@
+#cmakedefine U32 @U32@
+#cmakedefine U64 @U64@
 
-#cmakedefine HAVE_UNISTD_H
-#cmakedefine HAVE_PTHREAD_H
-#cmakedefine HAVE_DIRENT_H
-#cmakedefine HAVE_STRINGS_H
-#cmakedefine HAVE_LOCALE_H
-#cmakedefine HAVE_SYS_SELECT_H
-#cmakedefine HAVE_DLFCN_H
-#cmakedefine HAVE_PNG_H
+/* Headers */
+#cmakedefine HAVE_SYS_STDTYPES_H
+#cmakedefine HAVE_GL_GLU_H
 
-#cmakedefine HAVE_STRTOLL
-#cmakedefine HAVE_SCANDIR
+/* Functions */
+#cmakedefine01 HAVE_STRTOLL
+#cmakedefine01 HAVE_SCANDIR
 #cmakedefine01 HAVE_STRCASECMP
-#cmakedefine HAVE_SNPRINTF
-#cmakedefine HAVE_VSNPRINTF
+#cmakedefine01 HAVE_SNPRINTF
+
+/* Libraries */
+#cmakedefine01 HAVE_LIBJPEG
+#cmakedefine01 HAVE_GL
+
+#cmakedefine01 HAVE_X11
+#cmakedefine01 HAVE_FONTCONFIG
+#cmakedefine01 HAVE_XFT
+#cmakedefine01 HAVE_CAIRO
+#cmakedefine01 HAVE_UNISTD_H
+#cmakedefine01 HAVE_PTHREAD_H
+#cmakedefine01 HAVE_DIRENT_H
+#cmakedefine01 HAVE_STRINGS_H
+#cmakedefine01 HAVE_LOCALE_H
+#cmakedefine01 HAVE_SYS_SELECT_H
+#cmakedefine01 HAVE_DLFCN_H
+
+#cmakedefine01 HAVE_PTHREAD
+#cmakedefine01 HAVE_PNG_H
+#cmakedefine01 HAVE_PTHREAD_MUTEX_RECURSIVE
+#cmakedefine01 HAVE_LIBJPEG
+#cmakedefine01 HAVE_STRTOLL
+#cmakedefine01 HAVE_SCANDIR
+#cmakedefine01 HAVE_LIBPNG
+#cmakedefine01 HAVE_LIBZ
+#cmakedefine01 HAVE_LONG_LONG
+
+#cmakedefine01 USE_X11
+#cmakedefine01 USE_XFT
+#cmakedefine01 USE_POLL
+#cmakedefine01 BORDER_WIDTH
+#cmakedefine01 HAVE_SCANDIR_POSIX
+#cmakedefine01 HAVE_STRCASECMP
+#cmakedefine01 HAVE_SNPRINTF
+#cmakedefine01 HAVE_DLSYM
+
+#define BORDER_WIDTH @BORDER_WIDTH@
 
 #define VERSION "@PROJECT_VERSION@"
+#define FLTK_DOCDIR "@FLTK_DOCDIR@"
 
 #define SIZEOF_SHORT @SIZEOF_SHORT@
-#define SIZEOF_INT @SIZEOF_INT@
-#define SIZEOF_LONG @SIZEOF_LONG@
+#define SIZEOF_INT   @SIZEOF_INT@
+#define SIZEOF_LONG  @SIZEOF_LONG@
 
-#define WORDS_BIGENDIAN @WORDS_BIGENDIAN@
-
-#define USE_X11 1
-#define USE_XFT 1
-#define USE_POLL 1
-#define BORDER_WIDTH 1
-#define HAVE_SCANDIR_POSIX 1
-#define HAVE_DLSYM 1
-#define FLTK_DOCDIR @FLTK_DOCDIR@
-
+#cmakedefine01 WORDS_BIGENDIAN
+#cmakedefine NDEBUG

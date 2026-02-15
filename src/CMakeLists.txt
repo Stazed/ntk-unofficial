@@ -175,10 +175,14 @@ target_compile_definitions(ntk_static PRIVATE FL_LIBRARY=1 FL_INTERNALS=1)
 
 target_link_libraries(ntk
     PRIVATE
-        PkgConfig::X11
-        PkgConfig::FONTCONFIG
+        ${X11_LIBRARIES}
+        ${FONTCONFIG_LIBRARIES}
+#        ${XFT_LIBRARIES}
+        ${CAIRO_LIBRARIES}
+#        PkgConfig::X11
+#        PkgConfig::FONTCONFIG
         PkgConfig::XFT
-        PkgConfig::CAIRO
+#        PkgConfig::CAIRO
         Threads::Threads
         ${DL_LIBRARY}
         ${M_LIBRARY}
@@ -228,6 +232,7 @@ target_link_libraries(ntk_images
     ${ZLIB_LIBRARIES}
     ${DL_LIBRARY}
     ${M_LIBRARY}
+#    ${XFT_LIBRARIES}
     PkgConfig::XFT
     Threads::Threads
 )
@@ -238,6 +243,7 @@ target_link_libraries(ntk_static
     ${ZLIB_LIBRARIES}
     ${DL_LIBRARY}
     ${M_LIBRARY}
+#    ${XFT_LIBRARIES}
     PkgConfig::XFT
     Threads::Threads
 )

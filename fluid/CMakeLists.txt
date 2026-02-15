@@ -41,6 +41,10 @@ target_link_libraries(ntk-fluid
     ntk
     ntk_images
 
+    ${X11_LIBRARIES}
+    ${FONTCONFIG_LIBRARIES}
+#    ${XFT_LIBRARIES}
+    ${CAIRO_LIBRARIES}
     ${JPEG_LIBRARY}
     ${LIBPNG_LIBRARIES}
     ${ZLIB_LIBRARIES}
@@ -48,8 +52,8 @@ target_link_libraries(ntk-fluid
     ${M_LIBRARY}
     Threads::Threads
 
-    PkgConfig::X11
-    PkgConfig::FONTCONFIG
+#    PkgConfig::X11
+#    PkgConfig::FONTCONFIG
     PkgConfig::XFT
-    PkgConfig::CAIRO
+#    PkgConfig::CAIRO
 )
