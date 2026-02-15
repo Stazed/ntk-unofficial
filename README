@@ -31,6 +31,7 @@ Currently, there is none (beyond the FLTK 1.3 docs)
     libx11
     libxft
     zlib
+    glu     (optional)
 
 NTK uses the 'waf' build system.
      
@@ -53,4 +54,12 @@ To install to /usr/ use the following:
 # Usage #
 
 NTK uses pkg-config for publishing library information.
+
+# CMAKE BUILD #
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+    make    (-j n) where n is the number of CPUs
+    sudo make install
 
