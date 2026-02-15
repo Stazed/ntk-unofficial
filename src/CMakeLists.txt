@@ -177,17 +177,12 @@ target_link_libraries(ntk
     PRIVATE
         ${X11_LIBRARIES}
         ${FONTCONFIG_LIBRARIES}
-#        ${XFT_LIBRARIES}
         ${CAIRO_LIBRARIES}
-#        PkgConfig::X11
-#        PkgConfig::FONTCONFIG
         PkgConfig::XFT
-#        PkgConfig::CAIRO
         Threads::Threads
         ${DL_LIBRARY}
         ${M_LIBRARY}
 )
-
 
 set_target_properties(ntk PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -232,7 +227,6 @@ target_link_libraries(ntk_images
     ${ZLIB_LIBRARIES}
     ${DL_LIBRARY}
     ${M_LIBRARY}
-#    ${XFT_LIBRARIES}
     PkgConfig::XFT
     Threads::Threads
 )
@@ -243,7 +237,6 @@ target_link_libraries(ntk_static
     ${ZLIB_LIBRARIES}
     ${DL_LIBRARY}
     ${M_LIBRARY}
-#    ${XFT_LIBRARIES}
     PkgConfig::XFT
     Threads::Threads
 )
@@ -255,6 +248,7 @@ target_link_libraries(ntk_static
 if(ENABLE_GL)
 
     set(NTK_GL_SOURCES
+        ${NTK_SOURCES}
         gl_draw.cxx
         gl_start.cxx
         glut_compatability.cxx
@@ -266,20 +260,31 @@ if(ENABLE_GL)
     )
 
     add_library(ntk_gl SHARED ${NTK_GL_SOURCES})
+    target_compile_definitions(ntk_gl PRIVATE FL_LIBRARY=1 FL_INTERNALS=1)
 
     target_link_libraries(ntk_gl
         ${GL_LIBRARIES}
         ${X11_LIBRARIES}
+        ${FONTCONFIG_LIBRARIES}
+        ${CAIRO_LIBRARIES}
+        PkgConfig::XFT
         ${DL_LIBRARY}
         ${M_LIBRARY}
         Threads::Threads
     )
 
     add_library(ntk_gl_static STATIC ${NTK_GL_SOURCES})
+    target_compile_definitions(ntk_gl_static PRIVATE FL_LIBRARY=1 FL_INTERNALS=1)
+    set_target_properties(ntk_gl_static PROPERTIES
+        OUTPUT_NAME ntk_gl
+    )
 
     target_link_libraries(ntk_gl_static
         ${GL_LIBRARIES}
         ${X11_LIBRARIES}
+        ${FONTCONFIG_LIBRARIES}
+        ${CAIRO_LIBRARIES}
+        PkgConfig::XFT
         ${DL_LIBRARY}
         ${M_LIBRARY}
         Threads::Threads

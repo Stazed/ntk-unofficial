@@ -9,7 +9,7 @@
 
 /* Headers */
 #cmakedefine HAVE_SYS_STDTYPES_H
-#cmakedefine HAVE_GL_GLU_H
+#cmakedefine01 HAVE_GL_GLU_H
 
 /* Functions */
 #cmakedefine01 HAVE_STRTOLL

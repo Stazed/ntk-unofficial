@@ -110,10 +110,6 @@ else()
     set(HAVE_PTHREAD 0)
 endif()
 
-if(ENABLE_GL)
-    pkg_check_modules(GL REQUIRED glu)
-    add_compile_definitions(HAVE_GL=1)
-endif()
 
 # --------------------------------------------------
 # Header checks
