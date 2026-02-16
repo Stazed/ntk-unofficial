@@ -14,10 +14,7 @@ function(ntk_example target)
         ${X11_LIBRARIES}
         ${FONTCONFIG_LIBRARIES}
         ${CAIRO_LIBRARIES}
-#        PkgConfig::X11
-#        PkgConfig::FONTCONFIG
         PkgConfig::XFT
-#        PkgConfig::CAIRO
     )
 endfunction()
 
@@ -103,8 +100,6 @@ ntk_example(pack pack.cxx)
 ntk_example(checkers checkers.cxx)
 ntk_example(table table.cxx)
 ntk_example(mandelbrot mandelbrot.cxx mandelbrot_ui.cxx)
-ntk_example(fractals fractals.cxx fracviewer.cxx)
-
 
 # --------------------------------------------------
 # GL Examples (only if GL enabled)
@@ -116,4 +111,5 @@ if(ENABLE_GL)
     ntk_example_gl(shape shape.cxx)
     ntk_example_gl(fullscreen fullscreen.cxx)
     ntk_example_gl(cube cube.cxx)
+    ntk_example_gl(fractals fractals.cxx fracviewer.cxx)
 endif()

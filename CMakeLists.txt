@@ -166,6 +166,7 @@ check_library_exists(jpeg jpeg_CreateCompress "" HAVE_LIBJPEG)
 # ----------------------------------------------------------
 
 if(ENABLE_GL)
+    find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
     pkg_check_modules(GL REQUIRED glu)
     set(HAVE_GL 1)
     check_include_file(GL/glu.h HAVE_GL_GLU_H)

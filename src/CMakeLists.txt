@@ -262,24 +262,15 @@ if(ENABLE_GL)
     add_library(ntk_gl SHARED ${NTK_GL_SOURCES})
     target_compile_definitions(ntk_gl PRIVATE FL_LIBRARY=1 FL_INTERNALS=1)
 
-    target_link_libraries(ntk_gl
-        ${GL_LIBRARIES}
-        ${X11_LIBRARIES}
-        ${FONTCONFIG_LIBRARIES}
-        ${CAIRO_LIBRARIES}
-        PkgConfig::XFT
-        ${DL_LIBRARY}
-        ${M_LIBRARY}
-        Threads::Threads
-    )
-
     add_library(ntk_gl_static STATIC ${NTK_GL_SOURCES})
     target_compile_definitions(ntk_gl_static PRIVATE FL_LIBRARY=1 FL_INTERNALS=1)
     set_target_properties(ntk_gl_static PROPERTIES
         OUTPUT_NAME ntk_gl
     )
 
-    target_link_libraries(ntk_gl_static
+    set(NTK_GL_DEPS
+        OpenGL::OpenGL
+        OpenGL::GLX
         ${GL_LIBRARIES}
         ${X11_LIBRARIES}
         ${FONTCONFIG_LIBRARIES}
@@ -289,6 +280,11 @@ if(ENABLE_GL)
         ${M_LIBRARY}
         Threads::Threads
     )
+
+    foreach(lib ntk_gl ntk_gl_static)
+        target_link_libraries(${lib} PUBLIC ${NTK_GL_DEPS})
+    endforeach()
+
 endif()
 
 # --------------------------------------------------
