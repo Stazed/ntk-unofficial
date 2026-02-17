@@ -18,21 +18,20 @@ function(ntk_example target)
     )
 endfunction()
 
-function(ntk_example_gl target)
-    add_executable(${target} ${ARGN})
+if(ENABLE_GL)
+    function(ntk_example_gl target)
+        add_executable(${target} ${ARGN})
 
-    target_include_directories(${target} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-    )
+        target_include_directories(${target} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/..
+        )
 
-    target_link_libraries(${target}
-        ntk_static
-        ntk_images_static
-        ntk_gl_static
-    )
-endfunction()
-
+        target_link_libraries(${target}
+            ntk_gl_static
+        )
+    endfunction()
+endif()
 
 # --------------------------------------------------
 # Non-GL Examples
@@ -63,7 +62,7 @@ ntk_example(device device.cxx)
 ntk_example(utf8 utf8.cxx)
 ntk_example(overlay overlay.cxx)
 ntk_example(arc arc.cxx)
-ntk_example(cairo_test cairo_test.cxx)
+#ntk_example(cairo_test cairo_test.cxx) // this does not work for NTK
 ntk_example(browser browser.cxx)
 ntk_example(colbrowser colbrowser.cxx)
 ntk_example(rotated_text rotated_text.cxx)
