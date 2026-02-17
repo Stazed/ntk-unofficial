@@ -1,25 +1,7 @@
 # test/CMakeLists.txt
 
-function(ntk_example target)
-    add_executable(${target} ${ARGN})
-
-    target_include_directories(${target} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-    )
-
-    target_link_libraries(${target}
-        ntk_static
-        ntk_images_static
-        ${X11_LIBRARIES}
-        ${FONTCONFIG_LIBRARIES}
-        ${CAIRO_LIBRARIES}
-        PkgConfig::XFT
-    )
-endfunction()
-
-if(ENABLE_GL)
-    function(ntk_example_gl target)
+if(ENABLE_TEST_STATIC)
+    function(ntk_example target)
         add_executable(${target} ${ARGN})
 
         target_include_directories(${target} PRIVATE
@@ -28,10 +10,74 @@ if(ENABLE_GL)
         )
 
         target_link_libraries(${target}
-            ntk_gl_static
+            ntk_static
+            ntk_images_static
+            ${X11_LIBRARIES}
+            ${FONTCONFIG_LIBRARIES}
+            ${CAIRO_LIBRARIES}
+    #        PkgConfig::XFT
         )
     endfunction()
-endif()
+
+    if(ENABLE_GL)
+        function(ntk_example_gl target)
+            add_executable(${target} ${ARGN})
+
+            target_include_directories(${target} PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/..
+            )
+
+            target_link_libraries(${target}
+                ntk_gl_static
+            )
+        endfunction()
+    endif() #ENABLE_GL
+else()  # Dynamic
+    function(ntk_example target)
+        add_executable(${target} ${ARGN})
+
+        target_include_directories(${target} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/..
+        )
+
+        target_link_libraries(${target}
+            ntk
+            ntk_images
+            ${X11_LIBRARIES}
+    #        ${FONTCONFIG_LIBRARIES}
+    #        ${CAIRO_LIBRARIES}
+    #        PkgConfig::XFT
+        )
+    endfunction()
+
+    if(ENABLE_GL)
+        function(ntk_example_gl target)
+            add_executable(${target} ${ARGN})
+
+            target_include_directories(${target} PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/..
+            )
+
+            target_link_libraries(${target}
+                ntk_gl
+                ntk_images
+            )
+        endfunction()
+    endif() #ENABLE_GL
+endif() #ENABLE_TEST_STATIC
+
+function(ntk_copy_runtime target file)
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+            $<TARGET_FILE_DIR:${target}>/${file}
+    )
+endfunction()
+
+
 
 # --------------------------------------------------
 # Non-GL Examples
@@ -99,6 +145,8 @@ ntk_example(pack pack.cxx)
 ntk_example(checkers checkers.cxx)
 ntk_example(table table.cxx)
 ntk_example(mandelbrot mandelbrot.cxx mandelbrot_ui.cxx)
+
+ntk_copy_runtime(demo demo.menu)
 
 # --------------------------------------------------
 # GL Examples (only if GL enabled)
