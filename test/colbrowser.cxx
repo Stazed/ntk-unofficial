@@ -155,7 +155,7 @@ static int load_browser(char *fname)
   FILE *fp;
   RGBdb *db = rgbdb, *dbs = db + MAX_RGB;
   int r, g, b,  lr  = -1 , lg = -1, lb = -1;
-  char name[256], buf[256];
+  char name[256], buf[300];
 #ifdef __EMX__
   if (!(fp = fl_fopen(__XOS2RedirRoot(fname), "r")))
 #else
@@ -205,7 +205,7 @@ static int load_browser(char *fname)
 
 static int search_entry(int r, int g, int b)
 {
-  register RGBdb *db = rgbdb;
+  RGBdb *db = rgbdb;
   int i, j, diffr, diffg, diffb;
   unsigned int diff, mindiff;
   

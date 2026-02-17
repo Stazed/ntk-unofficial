@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     s->step(1);
     s->value(args[n]);
     s->align(FL_ALIGN_LEFT);
-    s->callback(slider_cb, (void*)n);
+    s->callback(slider_cb, (void*)(fl_intptr_t)n);
   }
 
   window.end();

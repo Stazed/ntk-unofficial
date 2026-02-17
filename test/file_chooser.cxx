@@ -260,7 +260,7 @@ pdf_check(const char *name,	// I - Name of file
 {
   const char	*home;		// Home directory
   char		preview[FL_PATH_MAX],	// Preview filename
-		command[FL_PATH_MAX];	// Command
+		command[3 * FL_PATH_MAX];	// Command
 
 
   if (memcmp(header, "%PDF", 4) != 0)
@@ -292,7 +292,7 @@ ps_check(const char *name,	// I - Name of file
   const char	*home;		// Home directory
   char		preview[FL_PATH_MAX],	// Preview filename
 		outname[FL_PATH_MAX],	// Preview PS file
-		command[FL_PATH_MAX];	// Command
+		command[3 * FL_PATH_MAX];	// Command
   FILE		*in,		// Input file
 		*out;		// Output file
   int		page;		// Current page
