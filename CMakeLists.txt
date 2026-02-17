@@ -280,6 +280,14 @@ if(ENABLE_GL)
         @ONLY
     )
 
+    install(TARGETS
+        ntk_gl ntk_gl_static
+        EXPORT ntkTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
     install(FILES
         ${CMAKE_BINARY_DIR}/ntk_gl.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
@@ -296,6 +304,12 @@ install(TARGETS
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+install(FILES CREDITS README
+    DESTINATION share/doc/ntk)
+
+install(FILES COPYING
+    DESTINATION share/licenses/ntk)
 
 # --------------------------------------------------
 # uninstall target
