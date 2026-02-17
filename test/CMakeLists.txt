@@ -147,6 +147,15 @@ ntk_example(table table.cxx)
 ntk_example(mandelbrot mandelbrot.cxx mandelbrot_ui.cxx)
 
 ntk_copy_runtime(demo demo.menu)
+ntk_copy_runtime(browser browser.cxx)
+ntk_copy_runtime(colbrowser rgb.txt)
+ntk_copy_runtime(help_dialog help_dialog.html)
+
+add_custom_command(TARGET help_dialog POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/images
+        $<TARGET_FILE_DIR:help_dialog>/images
+)
 
 # --------------------------------------------------
 # GL Examples (only if GL enabled)

@@ -84,7 +84,7 @@ main(int  argc,			// I - Number of command-line arguments
 #else
   
   if (argc <= argn)
-    help->load("../documentation/html/intro.html");
+    help->load("help_dialog.html");
   else
     help->load(argv[1]);
   
