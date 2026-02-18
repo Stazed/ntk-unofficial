@@ -401,13 +401,13 @@ struct FL_EXPORT Fl_Menu_Item {
 
   // back-compatibility, do not use:
 
-  /** back compatibility only \deprecated. */
+  /** \deprecated back compatibility. */
   int checked() const {return flags&FL_MENU_VALUE;}
 
-  /** back compatibility only \deprecated. */
+  /** \deprecated back compatibility only. */
   void check() {flags |= FL_MENU_VALUE;}
 
-  /** back compatibility only \deprecated. */
+  /** \deprecated back compatibility only. */
   void uncheck() {flags &= ~FL_MENU_VALUE;}
 
   int insert(int,const char*,int,Fl_Callback*,void* =0, int =0);

@@ -376,10 +376,6 @@ int Fl_Tree_Item::remove_child(const char *name) {
 ///
 /// No range checking is done on either index value.
 ///
-/// \returns
-///    -    0 : OK
-///    -   -1 : failed: 'a' or 'b' is not our immediate child
-///
 void Fl_Tree_Item::swap_children(int ax, int bx) {
   _children.swap(ax, bx);
 }

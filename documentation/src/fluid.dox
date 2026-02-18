@@ -1165,8 +1165,8 @@ of code. If you enter anything other than letters, numbers, and the
 underscore then FLUID treats it as code.
 
 \par
-A name refers to a function in your own code.  It must be
-declared as <tt>void name(<class>*,void*)</tt>.
+A name refers to a function in your own code.  
+It must be declared as \c void name(ClassName*, void*).
 
 \par
 A code snippet is inserted into a static function in the
