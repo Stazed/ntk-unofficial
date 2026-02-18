@@ -1029,8 +1029,8 @@ INPUT                  = src/index.dox \
                          src/fluid.dox \
                          src/advanced.dox \
                          src/unicode.dox \
-                         ../FL \
-                         ../src \
+                         ../../FL \
+                         ../../src \
                          src/enumerations.dox \
                          src/glut.dox \
                          src/forms.dox \
