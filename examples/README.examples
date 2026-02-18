@@ -7,7 +7,8 @@ FLTK EXAMPLE PROGRAMS
     those new to FLTK.
 
     The programs in this directory are NOT built automatically 
-    when you build FLTK; you have to manually build them.
+    when you build FLTK. Use cmake options, ENABLE_EXAMPLES=ON or
+    ENABLE_EXAMPLES_STATIC=ON to build them.
 
     The goals of these example programs:
 
