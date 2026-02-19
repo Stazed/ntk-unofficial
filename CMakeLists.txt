@@ -17,7 +17,6 @@ option(ENABLE_TEST_STATIC "Build test programs" OFF)
 option(ENABLE_EXAMPLES "Build example programs" OFF)
 option(ENABLE_EXAMPLES_STATIC "Build example programs" OFF)
 option(BUILD_DOC_HTML "Build HTML documentation" OFF)
-#option(BUILD_DOC_PDF  "Build PDF documentation" OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -251,7 +250,7 @@ if (ENABLE_EXAMPLES OR ENABLE_EXAMPLES_STATIC)
     add_subdirectory(examples)
 endif()
 
-if (BUILD_DOC_HTML)  #OR BUILD_DOC_PDF)
+if (BUILD_DOC_HTML)
     add_subdirectory(documentation)
 endif()
 

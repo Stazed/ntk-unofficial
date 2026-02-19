@@ -17,20 +17,6 @@ if(DOXYGEN_FOUND AND BUILD_DOC_HTML)
     )
 endif()
 
-#if(DOXYGEN_FOUND AND BUILD_DOC_PDF)
-#    find_program(PDFLATEX_EXECUTABLE pdflatex)
-#    find_program(MAKEINDEX_EXECUTABLE makeindex)
-
-#    add_custom_target(pdf
-#        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
-#        COMMAND ${PDFLATEX_EXECUTABLE} --interaction=nonstopmode refman.tex
-#        COMMAND ${MAKEINDEX_EXECUTABLE} refman.idx
-#        COMMAND ${PDFLATEX_EXECUTABLE} --interaction=nonstopmode refman.tex
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/latex
-#        COMMENT "Generating PDF documentation"
-#    )
-#endif()
-
 if(DOXYGEN_FOUND)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/documentation/.docs_copied
