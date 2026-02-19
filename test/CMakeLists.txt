@@ -15,7 +15,6 @@ if(ENABLE_TEST_STATIC)
             ${X11_LIBRARIES}
             ${FONTCONFIG_LIBRARIES}
             ${CAIRO_LIBRARIES}
-    #        PkgConfig::XFT
         )
     endfunction()
 
@@ -46,9 +45,6 @@ else()  # Dynamic
             ntk
             ntk_images
             ${X11_LIBRARIES}
-    #        ${FONTCONFIG_LIBRARIES}
-    #        ${CAIRO_LIBRARIES}
-    #        PkgConfig::XFT
         )
     endfunction()
 
@@ -76,8 +72,6 @@ function(ntk_copy_runtime target file)
             $<TARGET_FILE_DIR:${target}>/${file}
     )
 endfunction()
-
-
 
 # --------------------------------------------------
 # Non-GL Examples

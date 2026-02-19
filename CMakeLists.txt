@@ -1,3 +1,5 @@
+# NTK unofficial/CMakelistst.txt
+
 cmake_minimum_required(VERSION 3.16)
 project(ntk VERSION 1.3.1002 LANGUAGES C CXX)
 

@@ -1,3 +1,4 @@
+# documentation/CMakeLists.txt
 
 find_package(Doxygen REQUIRED)
 
@@ -15,9 +16,7 @@ if(DOXYGEN_FOUND AND BUILD_DOC_HTML)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating HTML documentation"
     )
-endif()
 
-if(DOXYGEN_FOUND)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/documentation/.docs_copied
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -30,12 +29,12 @@ if(DOXYGEN_FOUND)
 
     add_custom_target(copy_docs ALL
         DEPENDS ${CMAKE_BINARY_DIR}/documentation/.docs_copied
-)
+    )
+
+    add_custom_target(doc ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    add_dependencies(doc copy_docs)
 endif()
-
-add_custom_target(doc ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-add_dependencies(doc copy_docs)
