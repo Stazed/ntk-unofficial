@@ -35,6 +35,8 @@
 #include "../src/flstring.h"
 #include <stdarg.h>
 #include "alignment_panel.h"
+#include <FL/Fl.H>
+#include "Fl_Widget_Type.h"
 
 ////////////////////////////////////////////////////////////////
 // BASIC FILE WRITING:
@@ -300,9 +302,6 @@ const char *read_word(int wantbrace) {
 }
 
 ////////////////////////////////////////////////////////////////
-
-#include <FL/Fl.H>
-#include "Fl_Widget_Type.h"
 
 // global int variables:
 extern int i18n_type;

@@ -101,11 +101,13 @@ Fl_Dial::handle ( int m )
         case FL_ENTER:
             _mouse_inside = this;
             redraw();
-            return Fl_Dial_Base::handle(m) || 1;
+            Fl_Dial_Base::handle(m);
+            return 1;
         case FL_LEAVE:
             _mouse_inside = NULL;
             redraw();
-            return Fl_Dial_Base::handle(m) || 1;
+            Fl_Dial_Base::handle(m);
+            return 1;
         case FL_MOUSEWHEEL:
         {
             if ( this != Fl::belowmouse() )

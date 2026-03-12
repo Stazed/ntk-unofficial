@@ -740,9 +740,9 @@ void Fl_Text_Buffer::add_predelete_callback(Fl_Text_Predelete_Cb bufPreDeleteCB,
     newPreDeleteProcs[i + 1] = mPredeleteProcs[i];
     newCBArgs[i + 1] = mPredeleteCbArgs[i];
   }
-  if (!mNPredeleteProcs != 0) {
-    delete[]mPredeleteProcs;
-    delete[]mPredeleteCbArgs;
+  if (mNPredeleteProcs > 0) {
+    delete[] mPredeleteProcs;
+    delete[] mPredeleteCbArgs;
   }
   newPreDeleteProcs[0] = bufPreDeleteCB;
   newCBArgs[0] = cbArg;
@@ -1297,7 +1297,7 @@ void Fl_Text_Buffer::replace_selection_(Fl_Text_Selection * sel,
     return;
   
   /* Do the appropriate type of replace */
-    replace(start, end, text);
+  replace(start, end, text);
   
   /* Unselect (happens automatically in BufReplace, but BufReplaceRect
    can't detect when the contents of a selection goes away) */
