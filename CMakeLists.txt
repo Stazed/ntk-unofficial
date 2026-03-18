@@ -54,6 +54,13 @@ else()
     add_compile_definitions(NDEBUG)
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    message(STATUS "Building on FreeBSD")
+    list(PREPEND CMAKE_PREFIX_PATH "/usr/local")
+    include_directories(SYSTEM /usr/local/include)
+    link_directories(/usr/local/lib)
+endif()
+
 # --------------------------------------------------
 # Dependencies via pkg-config
 # --------------------------------------------------

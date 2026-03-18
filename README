@@ -63,3 +63,10 @@ NTK uses pkg-config for publishing library information.
     make    (-j n) where n is the number of CPUs
     sudo make install
 
+# FREEBSD BUILD #
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make    (-j n) where n is the number of CPUs
+    sudo make install
