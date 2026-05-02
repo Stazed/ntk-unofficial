@@ -33,25 +33,12 @@ Currently, there is none (beyond the FLTK 1.3 docs)
     zlib
     glu     (optional)
 
-NTK uses the 'waf' build system.
-     
-     Type:
-         ./waf configure --help 
-         
-to see compilation options.
 
 # Building and installing #
 
 It is recommended that this unofficial version be installed to /usr/ rather than the default location of /usr/local/.
 Doing so will replace any system installed version of NTK if it is packaged by your distribution. If you choose to install to /usr/local/, it may require setting some environment variables and has been found to cause runtime anomalies. Installing to /usr/local/ is not supported for this unofficial version.
 
-To install to /usr/ use the following:
-
-    ./waf configure --prefix=/usr/ --libdir=/usr/lib/
-    ./waf
-    sudo ./waf install
-
-# Usage #
 
 NTK uses pkg-config for publishing library information.
 
