@@ -13,14 +13,9 @@ of internals, and some new/improved widgets.
 
 NTK has the same license as FLTK.
 
-# Documentation #
-
-Currently, there is none (beyond the FLTK 1.3 docs)
-
 # Building #
 
 # Dependencies #
-    python=2.5-3.8  -  (for waf)
     cairo
     gcc-libs
     fontconfig
@@ -31,7 +26,7 @@ Currently, there is none (beyond the FLTK 1.3 docs)
     libx11
     libxft
     zlib
-    glu     (optional)
+    glu     (optional for OpenGL support)
 
 
 # Building and installing #
@@ -57,3 +52,19 @@ NTK uses pkg-config for publishing library information.
     cmake -DCMAKE_BUILD_TYPE=Release ..
     make    (-j n) where n is the number of CPUs
     sudo make install
+
+# Documentation #
+
+Currently, there is none (beyond the FLTK 1.3 docs)
+The HTML documentation can be built with:
+    cmake -DBUILD_DOC_HTML=ON ..
+
+# OTHER BUILD OPTIONS #
+
+    cmake -DENABLE_GL=ON ..             (Build with OpenGL support)
+    cmake -DENABLE_TEST ..              (Build test programs)
+    cmake -DENABLE_TEST_STATIC ..       (Build test programs statically)
+    cmake -DENABLE_EXAMPLES=ON ..       (Build example programs)
+    cmake -DENABLE_EXAMPLES_STATIC=ON   (Build example programs statically)
+
+

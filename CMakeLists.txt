@@ -15,9 +15,9 @@ include(CheckStructHasMember)
 
 option(ENABLE_GL "Build with OpenGL support" OFF)
 option(ENABLE_TEST "Build test programs" OFF)
-option(ENABLE_TEST_STATIC "Build test programs" OFF)
+option(ENABLE_TEST_STATIC "Build test programs using static library build" OFF)
 option(ENABLE_EXAMPLES "Build example programs" OFF)
-option(ENABLE_EXAMPLES_STATIC "Build example programs" OFF)
+option(ENABLE_EXAMPLES_STATIC "Build example programs using static library build" OFF)
 option(BUILD_DOC_HTML "Build HTML documentation" OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
